@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ thống quản lý yêu cầu hỗ trợ và xử lý sự cố</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <div class="container">
+        <div class="logo-badge">ĐẠI HỌC ĐÔNG Á • IT SUPPORT</div>
+        <h1>Hệ thống quản lý yêu cầu hỗ trợ và xử lý sự cố</h1>
+        <p class="description">Ứng dụng hỗ trợ kỹ thuật và xử lý sự cố công nghệ thông tin trong trường đại học.</p>
+        
+        <div class="status-box">
+            <span class="status-dot"></span>
+            <span class="status-text">Spring Boot Service status: System Active & MySQL Connected</span>
+        </div>
+
+        <div class="api-test-card">
+            <div class="api-header">
+                <span class="api-title">Kiểm tra API kết nối (/api/test)</span>
+                <button id="btnTestApi" class="btn-test">Gọi GET /api/test</button>
+            </div>
+            <pre id="apiResult">{
+    "status": "Ready",
+    "endpoint": "/api/test"
+}</pre>
+        </div>
+    </div>
+
+    <script th:src="@{/js/main.js}"></script>
+</body>
+</html>
