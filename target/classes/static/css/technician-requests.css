@@ -1,0 +1,219 @@
+/* ============================================================
+   EAUT SUPPORT — Technician Dashboard Stylesheet
+   Đại học Công nghệ Đông Á
+   ============================================================ */
+
+/* KPI Stat Cards for Technician */
+.tech-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: var(--space-4);
+    margin-bottom: var(--space-5);
+}
+
+@media (max-width: 1200px) {
+    .tech-kpi-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .tech-kpi-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .tech-kpi-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.tech-kpi-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+    box-shadow: var(--shadow-xs);
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.tech-kpi-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+}
+
+.tech-kpi-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.tech-kpi-icon svg {
+    width: 22px;
+    height: 22px;
+}
+
+.tech-kpi-icon.blue   { background: #eff6ff; color: #2563eb; }
+.tech-kpi-icon.amber  { background: #fffbeb; color: #d97706; }
+.tech-kpi-icon.sky    { background: #f0f9ff; color: #0284c7; }
+.tech-kpi-icon.emerald{ background: #ecfdf5; color: #059669; }
+.tech-kpi-icon.rose   { background: #fff1f2; color: #e11d48; }
+
+.tech-kpi-value {
+    font-size: var(--text-2xl);
+    font-weight: 800;
+    color: var(--text-primary);
+    line-height: 1.1;
+}
+
+.tech-kpi-label {
+    font-size: var(--text-xs);
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+/* Filter Chips Bar */
+.tech-filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+}
+
+.filter-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+}
+
+.filter-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: var(--radius-full);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    border: 1.5px solid var(--border-color);
+    background: var(--bg-surface);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.filter-chip:hover {
+    border-color: var(--brand-primary);
+    color: var(--brand-primary);
+    background: var(--brand-primary-light);
+}
+
+.filter-chip.active {
+    background: var(--brand-primary);
+    color: #ffffff;
+    border-color: var(--brand-primary);
+    box-shadow: 0 2px 8px rgba(30, 95, 168, 0.25);
+}
+
+.filter-chip-count {
+    min-width: 20px;
+    height: 20px;
+    border-radius: 10px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 6px;
+    background: rgba(255, 255, 255, 0.25);
+}
+
+.filter-chip:not(.active) .filter-chip-count {
+    background: var(--bg-muted);
+    color: var(--text-muted);
+}
+
+/* Table Actions */
+.btn-action-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.btn-action-sm {
+    padding: 4px 10px;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    border-radius: 4px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+}
+
+.btn-action-sm.btn-accept {
+    background: #eff6ff;
+    color: #1d4ed8;
+    border-color: #bfdbfe;
+}
+.btn-action-sm.btn-accept:hover {
+    background: #1d4ed8;
+    color: #ffffff;
+}
+
+.btn-action-sm.btn-progress {
+    background: #f0fdf4;
+    color: #15803d;
+    border-color: #bbf7d0;
+}
+.btn-action-sm.btn-progress:hover {
+    background: #15803d;
+    color: #ffffff;
+}
+
+.btn-action-sm.btn-need-info {
+    background: #fff7ed;
+    color: #c2410c;
+    border-color: #fed7aa;
+}
+.btn-action-sm.btn-need-info:hover {
+    background: #c2410c;
+    color: #ffffff;
+}
+
+.btn-action-sm.btn-complete {
+    background: #ecfdf5;
+    color: #047857;
+    border-color: #a7f3d0;
+    font-weight: 800;
+}
+.btn-action-sm.btn-complete:hover {
+    background: #047857;
+    color: #ffffff;
+}
+
+.btn-action-sm.btn-view {
+    background: var(--bg-muted);
+    color: var(--text-secondary);
+    border-color: var(--border-color);
+}
+.btn-action-sm.btn-view:hover {
+    background: var(--brand-primary-light);
+    color: var(--brand-primary);
+    border-color: var(--brand-primary);
+}
