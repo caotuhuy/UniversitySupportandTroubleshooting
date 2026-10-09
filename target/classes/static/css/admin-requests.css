@@ -1,0 +1,176 @@
+/* ============================================================
+   EAUT SUPPORT — Admin Request Management Stylesheet
+   Đại học Công nghệ Đông Á
+   ============================================================ */
+
+/* KPI Metric Cards for Admin */
+.admin-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: var(--space-4);
+    margin-bottom: var(--space-5);
+}
+
+@media (max-width: 1200px) {
+    .admin-kpi-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .admin-kpi-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .admin-kpi-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.admin-kpi-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+    box-shadow: var(--shadow-xs);
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.admin-kpi-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+}
+
+.admin-kpi-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.admin-kpi-icon svg {
+    width: 22px;
+    height: 22px;
+}
+
+.admin-kpi-icon.amber  { background: #fffbeb; color: #d97706; }
+.admin-kpi-icon.blue   { background: #eff6ff; color: #2563eb; }
+.admin-kpi-icon.purple { background: #f5f3ff; color: #7c3aed; }
+.admin-kpi-icon.emerald{ background: #ecfdf5; color: #059669; }
+.admin-kpi-icon.rose   { background: #fff1f2; color: #e11d48; }
+
+.admin-kpi-value {
+    font-size: var(--text-2xl);
+    font-weight: 800;
+    color: var(--text-primary);
+    line-height: 1.1;
+}
+
+.admin-kpi-label {
+    font-size: var(--text-xs);
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+/* Action buttons in Table */
+.btn-action-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.btn-action-sm {
+    padding: 4px 10px;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    border-radius: 4px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+}
+
+.btn-action-sm.btn-receive {
+    background: #ecfdf5;
+    color: #065f46;
+    border-color: #6ee7b7;
+}
+.btn-action-sm.btn-receive:hover {
+    background: #059669;
+    color: #ffffff;
+}
+
+.btn-action-sm.btn-reject {
+    background: #fff1f2;
+    color: #9f1239;
+    border-color: #fca5a5;
+}
+.btn-action-sm.btn-reject:hover {
+    background: #e11d48;
+    color: #ffffff;
+}
+
+.btn-action-sm.btn-assign {
+    background: #eff6ff;
+    color: #1d4ed8;
+    border-color: #bfdbfe;
+}
+.btn-action-sm.btn-assign:hover {
+    background: #1d4ed8;
+    color: #ffffff;
+}
+
+.btn-action-sm.btn-reassign {
+    background: #f5f3ff;
+    color: #6d28d9;
+    border-color: #ddd6fe;
+}
+.btn-action-sm.btn-reassign:hover {
+    background: #6d28d9;
+    color: #ffffff;
+}
+
+.btn-action-sm.btn-classify {
+    background: #f8fafc;
+    color: #334155;
+    border-color: var(--border-color);
+}
+.btn-action-sm.btn-classify:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+}
+
+.btn-action-sm.btn-view {
+    background: var(--bg-muted);
+    color: var(--text-secondary);
+    border-color: var(--border-color);
+}
+.btn-action-sm.btn-view:hover {
+    background: var(--brand-primary-light);
+    color: var(--brand-primary);
+    border-color: var(--brand-primary);
+}
+
+.btn-action-sm.btn-delete {
+    background: #fff1f2;
+    color: #be123c;
+    border-color: #fecdd3;
+}
+.btn-action-sm.btn-delete:hover {
+    background: #be123c;
+    color: #ffffff;
+}
