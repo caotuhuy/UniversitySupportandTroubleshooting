@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Quản trị tiếp nhận & điều phối yêu cầu hỗ trợ - EAUT SUPPORT">
+    <title>Điều phối yêu cầu — EAUT SUPPORT</title>
+    <link rel="stylesheet" th:href="@{/css/design-system.css}">
+    <link rel="stylesheet" th:href="@{/css/layout.css}">
+    <link rel="stylesheet" th:href="@{/css/admin-requests.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body class="app-body">
+<div class="app-body">
+    <div th:replace="~{fragments/layout :: sidebar}"></div>
+    <div class="app-content">
+        <div th:replace="~{fragments/layout :: topbar('Tiếp nhận &amp; Điều phối yêu cầu', true)}"></div>
+        <main class="app-main">
+
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="page-title-group">
+                    <div class="section-eyebrow">QUẢN TRỊ VIÊN HỆ THỐNG</div>
+                    <h1 class="page-title">Tiếp nhận &amp; Điều phối yêu cầu</h1>
+                    <p class="page-subtitle">Xem xét yêu cầu mới, phân loại danh mục, gán độ ưu tiên và phân công kỹ thuật viên xử lý.</p>
+                </div>
+                <div class="page-actions">
+                    <button type="button" class="btn btn-secondary" id="btnRefreshAdminRequests">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+                             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="23 4 23 10 17 10"/>
+                            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+                        </svg>
+                        Làm mới
+                    </button>
+                </div>
+            </div>
+
+            <!-- KPI Metric Cards -->
+            <div class="admin-kpi-grid">
+                <div class="admin-kpi-card">
+                    <div class="admin-kpi-icon amber">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="admin-kpi-value" id="kpiPending">0</div>
+                        <div class="admin-kpi-label">Chờ tiếp nhận</div>
+                    </div>
+                </div>
+                <div class="admin-kpi-card">
+                    <div class="admin-kpi-icon blue">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="admin-kpi-value" id="kpiReceived">0</div>
+                        <div class="admin-kpi-label">Đã tiếp nhận (Chưa giao)</div>
+                    </div>
+                </div>
+                <div class="admin-kpi-card">
+                    <div class="admin-kpi-icon purple">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="admin-kpi-value" id="kpiProcessing">0</div>
+                        <div class="admin-kpi-label">Đang được xử lý</div>
+                    </div>
+                </div>
+                <div class="admin-kpi-card">
+                    <div class="admin-kpi-icon emerald">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="admin-kpi-value" id="kpiCompleted">0</div>
+                        <div class="admin-kpi-label">Đã hoàn thành</div>
+                    </div>
+                </div>
+                <div class="admin-kpi-card">
+                    <div class="admin-kpi-icon rose">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                            <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="admin-kpi-value" id="kpiOverdue">0</div>
+                        <div class="admin-kpi-label">Quá hạn SLA</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alert banner -->
+            <div id="adminAlert" class="alert" role="alert" hidden style="margin-bottom:var(--space-4)"></div>
+
+            <!-- Table Card -->
+            <div class="card">
+                <!-- Toolbar -->
+                <div class="table-toolbar">
+                    <div class="table-toolbar-left">
+                        <div class="search-bar">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                            </svg>
+                            <input type="search" id="adminSearchInput" class="form-control"
+                                   placeholder="Tìm mã, tiêu đề, người gửi, vị trí...">
+                        </div>
+                        <select id="adminPriorityFilter" class="filter-select">
+                            <option value="">Tất cả mức độ</option>
+                            <option value="LOW">Thấp</option>
+                            <option value="MEDIUM">Trung bình</option>
+                            <option value="HIGH">Cao</option>
+                            <option value="URGENT">Khẩn cấp</option>
+                        </select>
+                        <select id="adminCategoryFilter" class="filter-select">
+                            <option value="">Tất cả danh mục</option>
+                        </select>
+                    </div>
+                    <div class="table-toolbar-right">
+                        <div class="filter-chips">
+                            <button type="button" class="filter-chip active" data-filter="PENDING">
+                                Chờ tiếp nhận <span class="filter-chip-count" id="countPending">0</span>
+                            </button>
+                            <button type="button" class="filter-chip" data-filter="RECEIVED">
+                                Đã tiếp nhận <span class="filter-chip-count" id="countReceived">0</span>
+                            </button>
+                            <button type="button" class="filter-chip" data-filter="IN_PROGRESS">
+                                Đang xử lý <span class="filter-chip-count" id="countProcessing">0</span>
+                            </button>
+                            <button type="button" class="filter-chip" data-filter="COMPLETED">
+                                Hoàn thành <span class="filter-chip-count" id="countCompleted">0</span>
+                            </button>
+                            <button type="button" class="filter-chip" data-filter="ALL">
+                                Tất cả <span class="filter-chip-count" id="countAll">0</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Loading Spinner -->
+                <div id="adminLoading" style="padding:var(--space-12);text-align:center">
+                    <div class="spinner spinner-lg" style="margin:0 auto var(--space-4)"></div>
+                    <p style="color:var(--text-muted);font-size:var(--text-md)">Đang tải danh sách yêu cầu quản trị...</p>
+                </div>
+
+                <!-- Empty State -->
+                <div id="adminEmpty" class="empty-state" hidden style="border:none">
+                    <div class="empty-state-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                        </svg>
+                    </div>
+                    <div class="empty-state-title">Không có yêu cầu phù hợp</div>
+                    <div class="empty-state-desc">Không tìm thấy yêu cầu nào trong trạng thái hoặc tiêu chí tìm kiếm này.</div>
+                </div>
+
+                <!-- Table -->
+                <div id="adminContent" class="table-wrapper" hidden style="border:none;border-radius:0">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th style="width:110px">Mã YC</th>
+                                <th>Tiêu đề / Danh mục</th>
+                                <th style="width:130px">Người gửi</th>
+                                <th style="width:130px">Vị trí</th>
+                                <th style="width:110px">Mức độ</th>
+                                <th style="width:130px">Trạng thái</th>
+                                <th style="width:110px">SLA</th>
+                                <th style="width:110px">Thời gian gửi</th>
+                                <th style="width:250px">Hành động điều phối</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminTableBody"></tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="pagination" id="adminPagination" hidden>
+                    <span id="adminPaginationInfo" style="font-size:var(--text-sm);color:var(--text-muted)"></span>
+                    <div class="pagination-controls" id="adminPaginationControls"></div>
+                </div>
+            </div>
+
+        </main>
+        <div th:replace="~{fragments/layout :: footer}"></div>
+    </div>
+</div>
+
+<!-- Modal: Phân công / Tái phân công KTV -->
+<div class="modal-backdrop" id="assignModal" hidden>
+    <div class="modal-card">
+        <div class="modal-header">
+            <h3 class="modal-title" id="assignModalTitle">Phân công kỹ thuật viên</h3>
+            <button class="modal-close" id="btnAssignModalClose">×</button>
+        </div>
+        <div class="modal-body">
+            <p id="assignModalDesc" style="font-size:var(--text-sm);color:var(--text-muted);margin-bottom:var(--space-4)">Chọn kỹ thuật viên phụ trách xử lý yêu cầu:</p>
+            <div class="form-group">
+                <label class="form-label" for="techSelect">Kỹ thuật viên phụ trách <span class="required">*</span></label>
+                <select id="techSelect" class="form-control" required>
+                    <option value="">-- Đang tải danh sách kỹ thuật viên --</option>
+                </select>
+            </div>
+            <div class="form-group" style="margin-top:var(--space-4)">
+                <label class="form-label" for="assignNoteInput">Ghi chú giao việc / Hướng dẫn xử lý</label>
+                <textarea id="assignNoteInput" class="form-control" rows="3" placeholder="Nhập ghi chú chỉ đạo cho kỹ thuật viên..."></textarea>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" id="btnAssignModalCloseFooter">Hủy bỏ</button>
+            <button type="button" class="btn btn-primary" id="btnAssignModalSubmit">Xác nhận phân công</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Từ chối yêu cầu -->
+<div class="modal-backdrop" id="rejectModal" hidden>
+    <div class="modal-card">
+        <div class="modal-header">
+            <h3 class="modal-title">Từ chối yêu cầu hỗ trợ</h3>
+            <button class="modal-close" id="btnRejectModalClose">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="alert alert-warning" style="margin-bottom:var(--space-4)">
+                <span>Yêu cầu sẽ bị từ chối và thông báo đến người gửi. Vui lòng nêu rõ lý do:</span>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="rejectReasonInput">Lý do từ chối <span class="required">*</span></label>
+                <textarea id="rejectReasonInput" class="form-control" rows="3" placeholder="Ví dụ: Sự cố không thuộc thẩm quyền hỗ trợ kỹ thuật, thông tin không đầy đủ..." required></textarea>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" id="btnRejectModalCloseFooter">Hủy bỏ</button>
+            <button type="button" class="btn btn-danger" id="btnRejectModalSubmit">Xác nhận từ chối</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Phân loại danh mục & Độ ưu tiên -->
+<div class="modal-backdrop" id="classifyModal" hidden>
+    <div class="modal-card">
+        <div class="modal-header">
+            <h3 class="modal-title">Cập nhật phân loại &amp; Độ ưu tiên</h3>
+            <button class="modal-close" id="btnClassifyModalClose">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label class="form-label" for="classifyCategorySelect">Danh mục sự cố</label>
+                <select id="classifyCategorySelect" class="form-control"></select>
+            </div>
+            <div class="form-group" style="margin-top:var(--space-4)">
+                <label class="form-label" for="classifyPrioritySelect">Mức độ ưu tiên</label>
+                <select id="classifyPrioritySelect" class="form-control">
+                    <option value="LOW">Thấp</option>
+                    <option value="MEDIUM">Trung bình</option>
+                    <option value="HIGH">Cao</option>
+                    <option value="URGENT">Khẩn cấp</option>
+                </select>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" id="btnClassifyModalCloseFooter">Hủy bỏ</button>
+            <button type="button" class="btn btn-primary" id="btnClassifyModalSubmit">Lưu thay đổi</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Xác nhận xóa yêu cầu -->
+<div class="modal-backdrop" id="deleteModal" hidden>
+    <div class="modal-card">
+        <div class="modal-header">
+            <h3 class="modal-title">Xác nhận xóa yêu cầu</h3>
+            <button class="modal-close" id="btnDeleteModalClose">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="alert alert-error" style="margin-bottom:var(--space-4)">
+                <span>Hành động này sẽ xóa vĩnh viễn yêu cầu và toàn bộ dữ liệu lịch sử liên quan khỏi hệ thống!</span>
+            </div>
+            <p id="deleteModalConfirmText" style="font-size:var(--text-sm);color:var(--text-primary)">
+                Bạn có chắc chắn muốn xóa yêu cầu này không?
+            </p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" id="btnDeleteModalCloseFooter">Hủy bỏ</button>
+            <button type="button" class="btn btn-danger" id="btnConfirmDelete">Xóa vĩnh viễn</button>
+        </div>
+    </div>
+</div>
+
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+<div th:replace="~{fragments/layout :: toasts}"></div>
+<script th:src="@{/js/main.js}"></script>
+<script th:src="@{/js/admin-requests.js}"></script>
+<div th:replace="~{fragments/layout :: page-scripts}"></div>
+<script>
+// Auto close backdrop click
+['assignModal','rejectModal','classifyModal','deleteModal'].forEach(function(id){
+    const m = document.getElementById(id);
+    if(m) m.addEventListener('click', function(e){ if(e.target===this) this.hidden=true; });
+});
+['btnAssignModalClose','btnAssignModalCloseFooter','btnRejectModalClose','btnRejectModalCloseFooter','btnClassifyModalClose','btnClassifyModalCloseFooter','btnDeleteModalClose','btnDeleteModalCloseFooter'].forEach(function(id){
+    const el = document.getElementById(id);
+    if(el) el.addEventListener('click', function(){
+        document.querySelectorAll('.modal-backdrop').forEach(function(m){ m.hidden=true; });
+    });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Không gian nhiệm vụ kỹ thuật viên - EAUT SUPPORT">
+    <title>Nhiệm vụ được phân công — EAUT SUPPORT</title>
+    <link rel="stylesheet" th:href="@{/css/design-system.css}">
+    <link rel="stylesheet" th:href="@{/css/layout.css}">
+    <link rel="stylesheet" th:href="@{/css/technician-requests.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body class="app-body">
+<div class="app-body">
+    <div th:replace="~{fragments/layout :: sidebar}"></div>
+    <div class="app-content">
+        <div th:replace="~{fragments/layout :: topbar('Nhiệm vụ được phân công', true)}"></div>
+        <main class="app-main">
+
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="page-title-group">
+                    <div class="section-eyebrow">KHÔNG GIAN KỸ THUẬT VIÊN</div>
+                    <h1 class="page-title">Nhiệm vụ được phân công</h1>
+                    <p class="page-subtitle">Quản lý, tiếp nhận và cập nhật tiến độ xử lý các sự cố kỹ thuật được giao cho bạn.</p>
+                </div>
+                <div class="page-actions">
+                    <button type="button" class="btn btn-secondary" id="btnRefreshTasks">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+                             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="23 4 23 10 17 10"/>
+                            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+                        </svg>
+                        Làm mới
+                    </button>
+                </div>
+            </div>
+
+            <!-- KPI Metric Cards -->
+            <div class="tech-kpi-grid">
+                <div class="tech-kpi-card">
+                    <div class="tech-kpi-icon blue">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="tech-kpi-value" id="kpiTotal">0</div>
+                        <div class="tech-kpi-label">Tổng nhiệm vụ</div>
+                    </div>
+                </div>
+                <div class="tech-kpi-card">
+                    <div class="tech-kpi-icon amber">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="tech-kpi-value" id="kpiAssigned">0</div>
+                        <div class="tech-kpi-label">Chờ tiếp nhận</div>
+                    </div>
+                </div>
+                <div class="tech-kpi-card">
+                    <div class="tech-kpi-icon sky">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="tech-kpi-value" id="kpiInProgress">0</div>
+                        <div class="tech-kpi-label">Đang xử lý</div>
+                    </div>
+                </div>
+                <div class="tech-kpi-card">
+                    <div class="tech-kpi-icon emerald">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="tech-kpi-value" id="kpiCompleted">0</div>
+                        <div class="tech-kpi-label">Đã hoàn thành</div>
+                    </div>
+                </div>
+                <div class="tech-kpi-card">
+                    <div class="tech-kpi-icon rose">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                            <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="tech-kpi-value" id="kpiOverdue">0</div>
+                        <div class="tech-kpi-label">Quá hạn / Cần chú ý</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alert banner -->
+            <div id="techAlert" class="alert" role="alert" hidden style="margin-bottom:var(--space-4)"></div>
+
+            <!-- Filter Bar & Search -->
+            <div class="card" style="margin-bottom:var(--space-5)">
+                <div class="table-toolbar">
+                    <div class="table-toolbar-left">
+                        <div class="search-bar">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                            </svg>
+                            <input type="search" id="techSearchInput" class="form-control"
+                                   placeholder="Tìm mã, tiêu đề, người gửi, vị trí...">
+                        </div>
+                        <select id="techPriorityFilter" class="filter-select">
+                            <option value="">Tất cả mức độ</option>
+                            <option value="LOW">Thấp</option>
+                            <option value="MEDIUM">Trung bình</option>
+                            <option value="HIGH">Cao</option>
+                            <option value="URGENT">Khẩn cấp</option>
+                        </select>
+                    </div>
+                    <div class="table-toolbar-right">
+                        <div class="filter-chips" id="filterChips">
+                            <button type="button" class="filter-chip active" data-filter="ALL">
+                                Tất cả <span class="filter-chip-count" id="countAll">0</span>
+                            </button>
+                            <button type="button" class="filter-chip" data-filter="ASSIGNED">
+                                Chờ nhận <span class="filter-chip-count" id="countAssigned">0</span>
+                            </button>
+                            <button type="button" class="filter-chip" data-filter="IN_PROGRESS">
+                                Đang xử lý <span class="filter-chip-count" id="countInProgress">0</span>
+                            </button>
+                            <button type="button" class="filter-chip" data-filter="WAITING_INFO">
+                                Chờ thông tin <span class="filter-chip-count" id="countWaiting">0</span>
+                            </button>
+                            <button type="button" class="filter-chip" data-filter="COMPLETED">
+                                Hoàn thành <span class="filter-chip-count" id="countCompleted">0</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Loading Spinner -->
+                <div id="techLoading" style="padding:var(--space-12);text-align:center">
+                    <div class="spinner spinner-lg" style="margin:0 auto var(--space-4)"></div>
+                    <p style="color:var(--text-muted);font-size:var(--text-md)">Đang tải danh sách nhiệm vụ...</p>
+                </div>
+
+                <!-- Empty State -->
+                <div id="techEmpty" class="empty-state" hidden style="border:none">
+                    <div class="empty-state-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+                        </svg>
+                    </div>
+                    <div class="empty-state-title">Không có nhiệm vụ nào</div>
+                    <div class="empty-state-desc">Hiện tại bạn không có nhiệm vụ nào trong danh mục hoặc trạng thái này.</div>
+                </div>
+
+                <!-- Table -->
+                <div id="techContent" class="table-wrapper" hidden style="border:none;border-radius:0">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th style="width:110px">Mã YC</th>
+                                <th>Tiêu đề / Danh mục</th>
+                                <th style="width:130px">Người gửi</th>
+                                <th style="width:130px">Phòng / Vị trí</th>
+                                <th style="width:110px">Mức độ</th>
+                                <th style="width:130px">Trạng thái</th>
+                                <th style="width:130px">Thời hạn SLA</th>
+                                <th style="width:230px">Thao tác xử lý</th>
+                            </tr>
+                        </thead>
+                        <tbody id="taskTableBody"></tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="pagination" id="techPagination" hidden>
+                    <span id="techPaginationInfo" style="font-size:var(--text-sm);color:var(--text-muted)"></span>
+                    <div class="pagination-controls" id="techPaginationControls"></div>
+                </div>
+            </div>
+
+        </main>
+        <div th:replace="~{fragments/layout :: footer}"></div>
+    </div>
+</div>
+
+<!-- Action Modal: Tiến độ / Cần thông tin / Hoàn thành -->
+<div class="modal-backdrop" id="techActionModal" hidden>
+    <div class="modal-card">
+        <div class="modal-header">
+            <h3 class="modal-title" id="actionModalTitle">Cập nhật tiến độ</h3>
+            <button type="button" class="modal-close" id="btnActionModalClose">×</button>
+        </div>
+        <div class="modal-body">
+            <p id="actionModalDesc" style="font-size:var(--text-sm);color:var(--text-muted);margin-bottom:var(--space-4)">
+                Nhập nội dung xử lý:
+            </p>
+            <div class="form-group">
+                <label class="form-label" for="actionNoteInput">
+                    Ghi chú chi tiết <span class="required">*</span>
+                </label>
+                <textarea id="actionNoteInput" class="form-control" rows="4"
+                          placeholder="Mô tả công việc đã thực hiện, nguyên nhân sự cố hoặc hướng giải quyết..."></textarea>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" id="btnActionModalCloseFooter">Hủy bỏ</button>
+            <button type="button" class="btn btn-primary" id="btnActionModalSubmit">Xác nhận</button>
+        </div>
+    </div>
+</div>
+
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+<div th:replace="~{fragments/layout :: toasts}"></div>
+<script th:src="@{/js/main.js}"></script>
+<script th:src="@{/js/technician-requests.js}"></script>
+<div th:replace="~{fragments/layout :: page-scripts}"></div>
+
+<script>
+document.getElementById('techActionModal').addEventListener('click', function(e) {
+    if (e.target === this) this.hidden = true;
+});
+['btnActionModalClose','btnActionModalCloseFooter'].forEach(function(id) {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('click', function() {
+        document.getElementById('techActionModal').hidden = true;
+    });
+});
+</script>
+</body>
+</html>

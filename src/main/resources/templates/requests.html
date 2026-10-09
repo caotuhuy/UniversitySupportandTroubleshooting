@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Danh sách yêu cầu hỗ trợ kỹ thuật - EAUT SUPPORT">
+    <title>Yêu cầu hỗ trợ — EAUT SUPPORT</title>
+    <link rel="stylesheet" th:href="@{/css/design-system.css}">
+    <link rel="stylesheet" th:href="@{/css/layout.css}">
+    <link rel="stylesheet" th:href="@{/css/requests.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body class="app-body">
+<div class="app-body">
+    <div th:replace="~{fragments/layout :: sidebar}"></div>
+    <div class="app-content">
+        <div th:replace="~{fragments/layout :: topbar('Yêu cầu hỗ trợ', true)}"></div>
+        <main class="app-main">
+
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="page-title-group">
+                    <div class="section-eyebrow">VẬN HÀNH HỖ TRỢ</div>
+                    <h1 class="page-title">Danh sách yêu cầu hỗ trợ</h1>
+                    <p class="page-subtitle">Tra cứu, lọc và theo dõi tiến độ các yêu cầu hỗ trợ kỹ thuật trong hệ thống.</p>
+                </div>
+                <div class="page-actions">
+                    <span class="badge badge-blue" id="requestCount" style="font-size:var(--text-sm);padding:6px 12px">Đang tải...</span>
+                    <a class="btn btn-primary" th:href="@{/create-request}" sec:authorize="hasRole('STUDENT')">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                        </svg>
+                        Tạo yêu cầu mới
+                    </a>
+                </div>
+            </div>
+
+            <!-- Error Banner -->
+            <div class="alert alert-error" id="requestError" hidden role="alert">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/>
+                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+                <div class="alert-content">
+                    <div class="alert-title">Không thể tải danh sách yêu cầu</div>
+                    <button id="retryRequests" class="btn btn-sm btn-outline-primary" type="button" style="margin-top:6px">Thử lại</button>
+                </div>
+            </div>
+
+            <!-- Quick Filter Chips -->
+            <div class="requests-filter-chips" id="requestsFilterChips">
+                <button type="button" class="filter-chip active" data-chip="ALL">
+                    Tất cả <span class="filter-chip-count" id="countChipAll">0</span>
+                </button>
+                <button type="button" class="filter-chip" data-chip="PENDING">
+                    Chờ tiếp nhận <span class="filter-chip-count" id="countChipPending">0</span>
+                </button>
+                <button type="button" class="filter-chip" data-chip="PROCESSING">
+                    Đang xử lý <span class="filter-chip-count" id="countChipProcessing">0</span>
+                </button>
+                <button type="button" class="filter-chip" data-chip="COMPLETED">
+                    Đã hoàn thành <span class="filter-chip-count" id="countChipCompleted">0</span>
+                </button>
+                <button type="button" class="filter-chip" data-chip="URGENT">
+                    Khẩn cấp <span class="filter-chip-count" id="countChipUrgent">0</span>
+                </button>
+            </div>
+
+            <!-- Main Card -->
+            <div class="card">
+                <!-- Toolbar -->
+                <div class="table-toolbar">
+                    <div class="table-toolbar-left">
+                        <!-- Search -->
+                        <div class="search-bar">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                            </svg>
+                            <input type="search" id="requestSearch" class="form-control"
+                                   placeholder="Tìm mã, tiêu đề, người gửi, phòng..." autocomplete="off">
+                        </div>
+                        <!-- Status Filter -->
+                        <select id="statusFilter" class="filter-select" aria-label="Lọc theo trạng thái">
+                            <option value="">Tất cả trạng thái</option>
+                            <option value="PENDING">Chờ tiếp nhận</option>
+                            <option value="RECEIVED">Đã tiếp nhận</option>
+                            <option value="ASSIGNED">Đã phân công</option>
+                            <option value="IN_PROGRESS">Đang xử lý</option>
+                            <option value="WAITING_INFO">Chờ thông tin</option>
+                            <option value="COMPLETED">Hoàn thành</option>
+                            <option value="REJECTED">Từ chối</option>
+                            <option value="CANCELLED">Đã hủy</option>
+                        </select>
+                        <!-- Priority Filter -->
+                        <select id="priorityFilter" class="filter-select" aria-label="Lọc theo độ ưu tiên">
+                            <option value="">Tất cả mức độ</option>
+                            <option value="LOW">Thấp</option>
+                            <option value="MEDIUM">Trung bình</option>
+                            <option value="HIGH">Cao</option>
+                            <option value="URGENT">Khẩn cấp</option>
+                        </select>
+                        <!-- Category Filter -->
+                        <select id="categoryFilter" class="filter-select" aria-label="Lọc theo danh mục">
+                            <option value="">Tất cả danh mục</option>
+                        </select>
+                    </div>
+                    <div class="table-toolbar-right">
+                        <!-- Sort select -->
+                        <select id="sortSelect" class="filter-select" aria-label="Sắp xếp">
+                            <option value="newest">Mới nhất trước</option>
+                            <option value="oldest">Cũ nhất trước</option>
+                            <option value="priority">Độ ưu tiên cao nhất</option>
+                        </select>
+                        <button class="btn btn-sm btn-ghost" id="clearFilters" type="button" title="Xóa toàn bộ bộ lọc">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                            </svg>
+                            Xóa lọc
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Skeleton Loading -->
+                <div id="requestSkeleton" style="padding:var(--space-5);display:flex;flex-direction:column;gap:12px">
+                    <div style="display:grid;grid-template-columns:90px 1.5fr 110px 110px 90px 110px 90px 100px 70px;gap:14px;align-items:center;padding:12px 0;border-bottom:1px solid var(--border-color)" aria-hidden="true">
+                        <div class="skeleton" style="height:16px;border-radius:4px"></div>
+                        <div class="skeleton skeleton-text"></div>
+                        <div class="skeleton" style="height:14px;width:90px;border-radius:4px"></div>
+                        <div class="skeleton" style="height:14px;width:80px;border-radius:4px"></div>
+                        <div class="skeleton" style="height:22px;border-radius:99px;width:70px"></div>
+                        <div class="skeleton" style="height:22px;border-radius:99px;width:95px"></div>
+                        <div class="skeleton" style="height:22px;border-radius:99px;width:80px"></div>
+                        <div class="skeleton" style="height:14px;width:80px;border-radius:4px"></div>
+                        <div class="skeleton" style="height:28px;width:55px;border-radius:6px"></div>
+                    </div>
+                    <div style="display:grid;grid-template-columns:90px 1.5fr 110px 110px 90px 110px 90px 100px 70px;gap:14px;align-items:center;padding:12px 0;border-bottom:1px solid var(--border-color)" aria-hidden="true">
+                        <div class="skeleton" style="height:16px;border-radius:4px"></div>
+                        <div class="skeleton skeleton-text"></div>
+                        <div class="skeleton" style="height:14px;width:90px;border-radius:4px"></div>
+                        <div class="skeleton" style="height:14px;width:80px;border-radius:4px"></div>
+                        <div class="skeleton" style="height:22px;border-radius:99px;width:70px"></div>
+                        <div class="skeleton" style="height:22px;border-radius:99px;width:95px"></div>
+                        <div class="skeleton" style="height:22px;border-radius:99px;width:80px"></div>
+                        <div class="skeleton" style="height:14px;width:80px;border-radius:4px"></div>
+                        <div class="skeleton" style="height:28px;width:55px;border-radius:6px"></div>
+                    </div>
+                    <div style="display:grid;grid-template-columns:90px 1.5fr 110px 110px 90px 110px 90px 100px 70px;gap:14px;align-items:center;padding:12px 0" aria-hidden="true">
+                        <div class="skeleton" style="height:16px;border-radius:4px"></div>
+                        <div class="skeleton skeleton-text"></div>
+                        <div class="skeleton" style="height:14px;width:90px;border-radius:4px"></div>
+                        <div class="skeleton" style="height:14px;width:80px;border-radius:4px"></div>
+                        <div class="skeleton" style="height:22px;border-radius:99px;width:70px"></div>
+                        <div class="skeleton" style="height:22px;border-radius:99px;width:95px"></div>
+                        <div class="skeleton" style="height:22px;border-radius:99px;width:80px"></div>
+                        <div class="skeleton" style="height:14px;width:80px;border-radius:4px"></div>
+                        <div class="skeleton" style="height:28px;width:55px;border-radius:6px"></div>
+                    </div>
+                </div>
+
+                <!-- Empty State -->
+                <div class="empty-state" id="requestEmpty" hidden>
+                    <div class="empty-state-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                        </svg>
+                    </div>
+                    <div class="empty-state-title">Không tìm thấy yêu cầu nào</div>
+                    <div class="empty-state-desc">Không có yêu cầu phù hợp với từ khóa hoặc bộ lọc đã chọn.</div>
+                    <button class="btn btn-outline-primary btn-sm" id="clearFilters2" type="button" style="margin-top:var(--space-3)">Xóa bộ lọc</button>
+                </div>
+
+                <!-- Table -->
+                <div class="table-wrapper" id="requestTableWrap" hidden style="border:none;border-radius:0">
+                    <table class="data-table" id="requestTable">
+                        <thead>
+                            <tr>
+                                <th style="width:110px">Mã YC</th>
+                                <th>Tiêu đề / Danh mục</th>
+                                <th style="width:130px">Người gửi</th>
+                                <th style="width:120px">Phòng</th>
+                                <th style="width:110px">Mức độ</th>
+                                <th style="width:130px">Trạng thái</th>
+                                <th style="width:110px">SLA</th>
+                                <th style="width:110px">Ngày tạo</th>
+                                <th class="col-actions" style="width:80px">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="requestTableBody"></tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="pagination" id="requestPagination" hidden>
+                    <span id="paginationInfo" style="font-size:var(--text-sm);color:var(--text-muted)"></span>
+                    <div class="pagination-controls" id="paginationControls"></div>
+                </div>
+            </div>
+
+        </main>
+        <div th:replace="~{fragments/layout :: footer}"></div>
+    </div>
+</div>
+
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+<div th:replace="~{fragments/layout :: toasts}"></div>
+<script th:src="@{/js/main.js}"></script>
+<script th:src="@{/js/requests.js}"></script>
+<div th:replace="~{fragments/layout :: page-scripts}"></div>
+</body>
+</html>
