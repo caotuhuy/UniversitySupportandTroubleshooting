@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chỉnh sửa yêu cầu | EAUT SUPPORT</title>
+    <link rel="stylesheet" th:href="@{/css/design-system.css}">
+    <link rel="stylesheet" th:href="@{/css/layout.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/create-request.css}">
+    <link rel="stylesheet" th:href="@{/css/request-edit.css}">
+</head>
+<body class="app-body edit-request-page">
+    <div class="app-shell">
+        <div th:replace="~{fragments/layout :: topbar('Chỉnh sửa yêu cầu', true)}"></div>
+        <div th:replace="~{fragments/layout :: sidebar}"></div>
+
+        <main class="app-main">
+            <!-- Navigation Back Link -->
+            <div class="page-heading edit-heading">
+                <div>
+                    <p class="section-kicker">CHỈNH SỬA YÊU CẦU HỖ TRỢ</p>
+                    <h1 id="pageTitleHeading">Chỉnh sửa yêu cầu</h1>
+                    <p class="page-subtitle" id="pageSubHeading">Cập nhật thông tin chi tiết sự cố cần hỗ trợ.</p>
+                </div>
+                <a class="secondary-link" id="backToDetailTopLink" th:href="@{/requests}">← Quay lại chi tiết yêu cầu</a>
+            </div>
+
+            <!-- Loading State -->
+            <div class="edit-loading-state panel" id="editLoading" role="status">
+                <div class="loading-spinner" aria-hidden="true"></div>
+                <p>Đang tải dữ liệu yêu cầu...</p>
+            </div>
+
+            <!-- Error State (404, Network Error) -->
+            <div class="edit-alert-box panel" id="editError" role="alert" hidden>
+                <div class="alert-icon" id="alertIcon" aria-hidden="true">!</div>
+                <div class="alert-content">
+                    <h2 class="alert-title" id="alertTitle">Không thể tải thông tin yêu cầu</h2>
+                    <p class="alert-message" id="alertMessage">Vui lòng thử lại sau.</p>
+                </div>
+                <div class="alert-actions">
+                    <button class="secondary-button" id="retryButton" type="button" hidden>Thử lại</button>
+                    <a class="primary-button" id="backToListButton" th:href="@{/requests}">← Quay lại danh sách</a>
+                </div>
+            </div>
+
+            <!-- Not Allowed Alert (Status not PENDING or WAITING_INFO) -->
+            <div class="edit-alert-box panel alert-not-allowed" id="editNotAllowedAlert" role="alert" hidden>
+                <div class="alert-icon" aria-hidden="true">⚠</div>
+                <div class="alert-content">
+                    <h2 class="alert-title">Không thể chỉnh sửa yêu cầu này</h2>
+                    <p class="alert-message" id="notAllowedMessage">Yêu cầu này đang ở trạng thái không cho phép chỉnh sửa thông tin.</p>
+                </div>
+                <div class="alert-actions">
+                    <a class="primary-button" id="notAllowedBackLink" th:href="@{/requests}">← Quay lại chi tiết yêu cầu</a>
+                </div>
+            </div>
+
+            <!-- Form Feedback Banner (Success / Error) -->
+            <div class="form-feedback" id="formFeedback" role="alert" hidden></div>
+
+            <!-- Main Edit Form (Hidden during loading / error / not allowed) -->
+            <form class="request-form" id="editRequestForm" novalidate hidden>
+                <!-- Section 0: Thông tin cố định (Read-only) -->
+                <section class="form-section panel readonly-meta-section">
+                    <div class="form-section-heading">
+                        <span class="section-number">ℹ</span>
+                        <div>
+                            <p class="section-kicker">THÔNG TIN HỆ THỐNG</p>
+                            <h2>Thông tin cố định (Chỉ đọc)</h2>
+                        </div>
+                    </div>
+                    <div class="readonly-grid">
+                        <div class="readonly-item">
+                            <span class="readonly-label">Mã yêu cầu</span>
+                            <span class="readonly-value request-code-text" id="metaRequestCode">—</span>
+                        </div>
+                        <div class="readonly-item">
+                            <span class="readonly-label">Người yêu cầu</span>
+                            <span class="readonly-value" id="metaRequester">—</span>
+                        </div>
+                        <div class="readonly-item">
+                            <span class="readonly-label">Trạng thái hiện tại</span>
+                            <span class="readonly-value">
+                                <span class="request-status" id="metaStatusBadge">—</span>
+                            </span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 1: Nội dung yêu cầu -->
+                <section class="form-section panel">
+                    <div class="form-section-heading">
+                        <span class="section-number">01</span>
+                        <div>
+                            <p class="section-kicker">NỘI DUNG</p>
+                            <h2>Thông tin yêu cầu</h2>
+                        </div>
+                    </div>
+                    <div class="form-fields">
+                        <div class="field-group field-full">
+                            <label for="title">Tiêu đề yêu cầu <span>*</span></label>
+                            <input id="title" name="title" type="text" maxlength="200" placeholder="Ví dụ: Máy chiếu phòng A101 không hoạt động">
+                            <small class="field-error" data-error-for="title"></small>
+                        </div>
+                        <div class="field-group field-full">
+                            <label for="description">Mô tả chi tiết</label>
+                            <textarea id="description" name="description" rows="6" placeholder="Mô tả hiện tượng, thời điểm xảy ra và các thông tin liên quan..."></textarea>
+                            <small class="field-error" data-error-for="description"></small>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 2: Phân loại & Vị trí -->
+                <section class="form-section panel">
+                    <div class="form-section-heading">
+                        <span class="section-number">02</span>
+                        <div>
+                            <p class="section-kicker">PHÂN LOẠI</p>
+                            <h2>Thông tin liên quan</h2>
+                        </div>
+                    </div>
+                    <div class="form-fields two-columns">
+                        <div class="field-group">
+                            <label for="categoryId">Danh mục sự cố <span>*</span></label>
+                            <select id="categoryId" name="categoryId">
+                                <option value="">Đang tải danh mục...</option>
+                            </select>
+                            <small class="field-error" data-error-for="categoryId"></small>
+                        </div>
+                        <div class="field-group">
+                            <label for="roomId">Phòng</label>
+                            <select id="roomId" name="roomId">
+                                <option value="">Đang tải phòng...</option>
+                            </select>
+                            <small class="field-error" data-error-for="roomId"></small>
+                        </div>
+                        <div class="field-group field-full">
+                            <label for="deviceId">Thiết bị</label>
+                            <select id="deviceId" name="deviceId">
+                                <option value="">Đang tải thiết bị...</option>
+                            </select>
+                            <small class="field-error" data-error-for="deviceId"></small>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 3: Mức độ ưu tiên -->
+                <section class="form-section panel priority-section">
+                    <div class="form-section-heading">
+                        <span class="section-number">03</span>
+                        <div>
+                            <p class="section-kicker">MỨC ĐỘ</p>
+                            <h2>Ưu tiên xử lý</h2>
+                        </div>
+                    </div>
+                    <div class="priority-options" role="radiogroup" aria-label="Mức độ ưu tiên">
+                        <label class="priority-option">
+                            <input type="radio" name="priority" value="LOW">
+                            <span><b>Thấp</b><small>LOW</small></span>
+                        </label>
+                        <label class="priority-option">
+                            <input type="radio" name="priority" value="MEDIUM">
+                            <span><b>Trung bình</b><small>MEDIUM</small></span>
+                        </label>
+                        <label class="priority-option">
+                            <input type="radio" name="priority" value="HIGH">
+                            <span><b>Cao</b><small>HIGH</small></span>
+                        </label>
+                        <label class="priority-option">
+                            <input type="radio" name="priority" value="URGENT">
+                            <span><b>Khẩn cấp</b><small>URGENT</small></span>
+                        </label>
+                    </div>
+                    <small class="field-error" data-error-for="priority"></small>
+                </section>
+
+                <!-- Form Action Buttons -->
+                <div class="form-actions">
+                    <a class="cancel-link" id="cancelEditButton" th:href="@{/requests}">Hủy</a>
+                    <button class="primary-button" id="submitEditRequest" type="submit">
+                        <span class="button-icon" aria-hidden="true">✓</span>
+                        <span class="button-text">Lưu thay đổi</span>
+                    </button>
+                </div>
+            </form>
+        </main>
+
+        <div th:replace="~{fragments/layout :: footer}"></div>
+    </div>
+
+    <div class="sidebar-overlay" data-sidebar-toggle></div>
+    <script th:src="@{/js/main.js}"></script>
+    <script th:src="@{/js/request-edit.js}"></script>
+</body>
+</html>

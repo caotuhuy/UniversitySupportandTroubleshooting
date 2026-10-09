@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý phòng học &amp; làm việc | EAUT SUPPORT</title>
+    <link rel="stylesheet" th:href="@{/css/design-system.css}">
+    <link rel="stylesheet" th:href="@{/css/layout.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/requests.css}">
+    <link rel="stylesheet" th:href="@{/css/technician-requests.css}">
+</head>
+<body class="app-body">
+    <div th:replace="~{fragments/layout :: topbar('Quản lý phòng', true)}"></div>
+    <div class="sidebar-overlay"></div>
+    <div th:replace="~{fragments/layout :: sidebar}"></div>
+
+    <main class="app-main">
+        <div class="page-heading">
+            <div>
+                <p class="section-kicker">QUẢN TRỊ HỆ THỐNG</p>
+                <h1>Quản Lý Phòng</h1>
+                <p class="page-subtitle">Danh mục các giảng đường, phòng thực hành, phòng họp và văn phòng làm việc</p>
+            </div>
+            <div class="header-tools">
+                <button type="button" class="primary-button" id="btnOpenCreateRoom">＋ Thêm phòng mới</button>
+            </div>
+        </div>
+
+        <div class="filter-search-wrapper" style="margin-bottom: 20px; display: flex; gap: 12px;">
+            <input type="text" id="roomSearchInput" class="form-control" placeholder="Tìm theo mã phòng, tên phòng, tòa nhà..." style="max-width: 320px;">
+        </div>
+
+        <div id="roomAlert" class="tech-alert" style="display: none;"></div>
+
+        <!-- Loading -->
+        <div id="roomLoading" class="panel loading-state">
+            <div class="loading-spinner"></div>
+            <p>Đang tải danh sách phòng...</p>
+        </div>
+
+        <!-- Empty -->
+        <div id="roomEmpty" class="panel empty-state" hidden>
+            <p class="empty-icon">▦</p>
+            <h3>Không có phòng nào</h3>
+            <p>Chưa có dữ liệu phòng hoặc không tìm thấy phòng phù hợp.</p>
+        </div>
+
+        <!-- Table -->
+        <div id="roomContent" class="panel table-panel" hidden>
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Mã phòng</th>
+                            <th>Tên phòng</th>
+                            <th>Tòa nhà</th>
+                            <th>Tầng</th>
+                            <th>Trạng thái</th>
+                            <th>Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody id="roomTableBody">
+                        <!-- Dynamic items -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal Thêm/Sửa phòng -->
+    <div class="modal-backdrop" id="roomModal" hidden>
+        <div class="modal-card">
+            <h3 class="modal-title" id="roomModalTitle">Thêm phòng mới</h3>
+            <form id="roomForm">
+                <input type="hidden" id="roomIdInput">
+                <div class="form-group" style="margin-top: 14px;">
+                    <label for="inputRoomCode">Mã phòng <span class="required">*</span></label>
+                    <input type="text" id="inputRoomCode" class="form-control" required placeholder="Ví dụ: P204, LAB01">
+                </div>
+                <div class="form-group" style="margin-top: 14px;">
+                    <label for="inputRoomName">Tên phòng <span class="required">*</span></label>
+                    <input type="text" id="inputRoomName" class="form-control" required placeholder="Ví dụ: Phòng Thực hành Mạng 1">
+                </div>
+                <div class="form-group" style="margin-top: 14px;">
+                    <label for="inputBuilding">Tòa nhà</label>
+                    <input type="text" id="inputBuilding" class="form-control" placeholder="Ví dụ: Khu A, Khu B">
+                </div>
+                <div class="form-group" style="margin-top: 14px;">
+                    <label for="inputFloor">Tầng</label>
+                    <input type="text" id="inputFloor" class="form-control" placeholder="Ví dụ: Tầng 2, Tầng 3">
+                </div>
+                <div class="form-group" style="margin-top: 14px;">
+                    <label for="inputRoomStatus">Trạng thái</label>
+                    <select id="inputRoomStatus" class="form-control">
+                        <option value="ACTIVE">Hoạt động (ACTIVE)</option>
+                        <option value="MAINTENANCE">Bảo trì (MAINTENANCE)</option>
+                        <option value="INACTIVE">Ngừng sử dụng (INACTIVE)</option>
+                    </select>
+                </div>
+                <div class="modal-actions" style="margin-top: 20px;">
+                    <button type="button" class="secondary-button" id="btnRoomModalClose">Hủy</button>
+                    <button type="submit" class="primary-button" id="btnRoomModalSubmit">Lưu thông tin</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/layout :: footer}"></div>
+
+    <script th:src="@{/js/main.js}"></script>
+    <script th:src="@{/js/admin-rooms.js}"></script>
+</body>
+</html>

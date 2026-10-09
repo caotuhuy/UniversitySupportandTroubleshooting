@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cấu hình SLA | EAUT SUPPORT</title>
+    <link rel="stylesheet" th:href="@{/css/design-system.css}">
+    <link rel="stylesheet" th:href="@{/css/layout.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/requests.css}">
+    <link rel="stylesheet" th:href="@{/css/technician-requests.css}">
+</head>
+<body class="app-body">
+    <div th:replace="~{fragments/layout :: topbar('Cấu hình SLA', true)}"></div>
+    <div class="sidebar-overlay"></div>
+    <div th:replace="~{fragments/layout :: sidebar}"></div>
+
+    <main class="app-main">
+        <div class="page-heading">
+            <div>
+                <p class="section-kicker">QUẢN TRỊ HỆ THỐNG</p>
+                <h1>Cấu Hình Cam Kết Mức Dịch Vụ (SLA)</h1>
+                <p class="page-subtitle">Thiết lập thời gian phản hồi, thời gian cảnh báo và thời hạn hoàn thành xử lý sự cố theo độ ưu tiên</p>
+            </div>
+            <div class="header-tools">
+                <button type="button" class="primary-button" id="btnOpenCreateSla">＋ Thêm cấu hình SLA</button>
+            </div>
+        </div>
+
+        <div id="slaAlert" class="tech-alert" style="display: none;"></div>
+
+        <!-- Loading -->
+        <div id="slaLoading" class="panel loading-state">
+            <div class="loading-spinner"></div>
+            <p>Đang tải cấu hình SLA...</p>
+        </div>
+
+        <!-- Empty -->
+        <div id="slaEmpty" class="panel empty-state" hidden>
+            <p class="empty-icon">⏱</p>
+            <h3>Chưa có cấu hình SLA</h3>
+            <p>Chưa có mức cam kết dịch vụ nào được thiết lập trong hệ thống.</p>
+        </div>
+
+        <!-- Table -->
+        <div id="slaContent" class="panel table-panel" hidden>
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Mức ưu tiên</th>
+                            <th>Thời gian phản hồi (giờ)</th>
+                            <th>Thời gian giải quyết (giờ)</th>
+                            <th>Cảnh báo trước (giờ)</th>
+                            <th>Trạng thái</th>
+                            <th>Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody id="slaTableBody">
+                        <!-- Dynamic items -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal Thêm/Sửa SLA -->
+    <div class="modal-backdrop" id="slaModal" hidden>
+        <div class="modal-card">
+            <h3 class="modal-title" id="slaModalTitle">Thêm cấu hình SLA</h3>
+            <form id="slaForm">
+                <input type="hidden" id="slaIdInput">
+                <div class="form-group" style="margin-top: 14px;">
+                    <label for="inputSlaPriority">Mức độ ưu tiên <span class="required">*</span></label>
+                    <select id="inputSlaPriority" class="form-control" required>
+                        <option value="LOW">Thấp (LOW)</option>
+                        <option value="MEDIUM">Trung bình (MEDIUM)</option>
+                        <option value="HIGH">Cao (HIGH)</option>
+                        <option value="URGENT">Khẩn cấp (URGENT)</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin-top: 14px;">
+                    <label for="inputResponseTime">Thời gian phản hồi tối đa (giờ) <span class="required">*</span></label>
+                    <input type="number" id="inputResponseTime" class="form-control" min="1" required placeholder="Ví dụ: 4">
+                </div>
+                <div class="form-group" style="margin-top: 14px;">
+                    <label for="inputResolutionTime">Thời gian xử lý hoàn tất tối đa (giờ) <span class="required">*</span></label>
+                    <input type="number" id="inputResolutionTime" class="form-control" min="1" required placeholder="Ví dụ: 24">
+                </div>
+                <div class="form-group" style="margin-top: 14px;">
+                    <label for="inputWarningTime">Thời gian cảnh báo trước (giờ) <span class="required">*</span></label>
+                    <input type="number" id="inputWarningTime" class="form-control" min="1" required placeholder="Ví dụ: 2">
+                    <small class="form-hint" style="font-size: 0.75rem; color: #64748b;">Quy tắc: Cảnh báo ≤ Phản hồi ≤ Hoàn thành</small>
+                </div>
+                <div class="form-group" style="margin-top: 14px;">
+                    <label for="inputSlaStatus">Trạng thái</label>
+                    <select id="inputSlaStatus" class="form-control">
+                        <option value="ACTIVE">Hoạt động (ACTIVE)</option>
+                        <option value="INACTIVE">Tạm ngưng (INACTIVE)</option>
+                    </select>
+                </div>
+                <div class="modal-actions" style="margin-top: 20px;">
+                    <button type="button" class="secondary-button" id="btnSlaModalClose">Hủy</button>
+                    <button type="submit" class="primary-button" id="btnSlaModalSubmit">Lưu cấu hình</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/layout :: footer}"></div>
+
+    <script th:src="@{/js/main.js}"></script>
+    <script th:src="@{/js/admin-sla.js}"></script>
+</body>
+</html>

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý thiết bị | EAUT SUPPORT</title>
+    <link rel="stylesheet" th:href="@{/css/design-system.css}">
+    <link rel="stylesheet" th:href="@{/css/layout.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/requests.css}">
+    <link rel="stylesheet" th:href="@{/css/technician-requests.css}">
+</head>
+<body class="app-body">
+    <div th:replace="~{fragments/layout :: topbar('Quản lý thiết bị', true)}"></div>
+    <div class="sidebar-overlay"></div>
+    <div th:replace="~{fragments/layout :: sidebar}"></div>
+
+    <main class="app-main">
+        <div class="page-heading">
+            <div>
+                <p class="section-kicker">QUẢN TRỊ HỆ THỐNG</p>
+                <h1>Quản Lý Thiết Bị</h1>
+                <p class="page-subtitle">Theo dõi tình trạng máy tính, máy chiếu, thiết bị mạng và các trang thiết bị trường học</p>
+            </div>
+            <div class="header-tools">
+                <button type="button" class="primary-button" id="btnOpenCreateDevice">＋ Thêm thiết bị mới</button>
+            </div>
+        </div>
+
+        <div class="filter-search-wrapper" style="margin-bottom: 20px; display: flex; gap: 12px; flex-wrap: wrap;">
+            <input type="text" id="deviceSearchInput" class="form-control" placeholder="Tìm theo mã, tên thiết bị, loại..." style="max-width: 320px;">
+            <select id="deviceStatusFilter" class="form-control" style="max-width: 180px;">
+                <option value="ALL">Tất cả trạng thái</option>
+                <option value="ACTIVE">Hoạt động (ACTIVE)</option>
+                <option value="MAINTENANCE">Bảo trì (MAINTENANCE)</option>
+                <option value="BROKEN">Hỏng hóc (BROKEN)</option>
+                <option value="INACTIVE">Ngừng dùng (INACTIVE)</option>
+            </select>
+        </div>
+
+        <div id="deviceAlert" class="tech-alert" style="display: none;"></div>
+
+        <!-- Loading -->
+        <div id="deviceLoading" class="panel loading-state">
+            <div class="loading-spinner"></div>
+            <p>Đang tải danh sách thiết bị...</p>
+        </div>
+
+        <!-- Empty -->
+        <div id="deviceEmpty" class="panel empty-state" hidden>
+            <p class="empty-icon">▣</p>
+            <h3>Không có thiết bị phù hợp</h3>
+            <p>Chưa có dữ liệu thiết bị hoặc không tìm thấy thiết bị phù hợp.</p>
+        </div>
+
+        <!-- Table -->
+        <div id="deviceContent" class="panel table-panel" hidden>
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Mã thiết bị</th>
+                            <th>Tên thiết bị</th>
+                            <th>Loại</th>
+                            <th>Phòng lắp đặt</th>
+                            <th>Trạng thái</th>
+                            <th>Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody id="deviceTableBody">
+                        <!-- Dynamic items -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal Thêm/Sửa thiết bị -->
+    <div class="modal-backdrop" id="deviceModal" hidden>
+        <div class="modal-card">
+            <h3 class="modal-title" id="deviceModalTitle">Thêm thiết bị mới</h3>
+            <form id="deviceForm">
+                <input type="hidden" id="deviceIdInput">
+                <div class="form-group" style="margin-top: 14px;">
+                    <label for="inputDeviceCode">Mã thiết bị <span class="required">*</span></label>
+                    <input type="text" id="inputDeviceCode" class="form-control" required placeholder="Ví dụ: PC-01, PRJ-A201">
+                </div>
+                <div class="form-group" style="margin-top: 14px;">
+                    <label for="inputDeviceName">Tên thiết bị <span class="required">*</span></label>
+                    <input type="text" id="inputDeviceName" class="form-control" required placeholder="Ví dụ: Máy chiếu Panasonic PT-LB303">
+                </div>
+                <div class="form-group" style="margin-top: 14px;">
+                    <label for="inputDeviceType">Loại thiết bị</label>
+                    <input type="text" id="inputDeviceType" class="form-control" placeholder="Ví dụ: Máy chiếu, Máy tính, Router">
+                </div>
+                <div class="form-group" style="margin-top: 14px;">
+                    <label for="inputDeviceRoom">Phòng lắp đặt</label>
+                    <select id="inputDeviceRoom" class="form-control">
+                        <option value="">-- Chọn phòng lắp đặt --</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin-top: 14px;">
+                    <label for="inputDeviceStatus">Trạng thái thiết bị</label>
+                    <select id="inputDeviceStatus" class="form-control">
+                        <option value="ACTIVE">Hoạt động (ACTIVE)</option>
+                        <option value="MAINTENANCE">Bảo trì (MAINTENANCE)</option>
+                        <option value="BROKEN">Bị hỏng (BROKEN)</option>
+                        <option value="INACTIVE">Ngừng sử dụng (INACTIVE)</option>
+                    </select>
+                </div>
+                <div class="modal-actions" style="margin-top: 20px;">
+                    <button type="button" class="secondary-button" id="btnDeviceModalClose">Hủy</button>
+                    <button type="submit" class="primary-button" id="btnDeviceModalSubmit">Lưu thiết bị</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/layout :: footer}"></div>
+
+    <script th:src="@{/js/main.js}"></script>
+    <script th:src="@{/js/admin-devices.js}"></script>
+</body>
+</html>

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý danh mục sự cố | EAUT SUPPORT</title>
+    <link rel="stylesheet" th:href="@{/css/design-system.css}">
+    <link rel="stylesheet" th:href="@{/css/layout.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/requests.css}">
+    <link rel="stylesheet" th:href="@{/css/technician-requests.css}">
+</head>
+<body class="app-body">
+    <div th:replace="~{fragments/layout :: topbar('Danh mục sự cố &amp; Hỗ trợ', true)}"></div>
+    <div class="sidebar-overlay"></div>
+    <div th:replace="~{fragments/layout :: sidebar}"></div>
+
+    <main class="app-main">
+        <div class="page-heading">
+            <div>
+                <p class="section-kicker">QUẢN TRỊ HỆ THỐNG</p>
+                <h1>Danh Mục Sự Cố &amp; Hỗ Trợ</h1>
+                <p class="page-subtitle">Phân loại các lĩnh vực hỗ trợ như Phần cứng, Phần mềm, Mạng, Tài khoản, Thiết bị</p>
+            </div>
+            <div class="header-tools">
+                <button type="button" class="primary-button" id="btnOpenCreateCat">＋ Thêm danh mục</button>
+            </div>
+        </div>
+
+        <div class="filter-search-wrapper" style="margin-bottom: 20px; display: flex; gap: 12px;">
+            <input type="text" id="catSearchInput" class="form-control" placeholder="Tìm kiếm theo tên hoặc mô tả..." style="max-width: 320px;">
+        </div>
+
+        <div id="catAlert" class="tech-alert" style="display: none;"></div>
+
+        <!-- Loading -->
+        <div id="catLoading" class="panel loading-state">
+            <div class="loading-spinner"></div>
+            <p>Đang tải danh mục sự cố...</p>
+        </div>
+
+        <!-- Empty -->
+        <div id="catEmpty" class="panel empty-state" hidden>
+            <p class="empty-icon">◈</p>
+            <h3>Không có danh mục nào</h3>
+            <p>Chưa có danh mục sự cố nào được tạo trong hệ thống.</p>
+        </div>
+
+        <!-- Table -->
+        <div id="catContent" class="panel table-panel" hidden>
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Tên danh mục</th>
+                            <th>Mô tả</th>
+                            <th>Trạng thái</th>
+                            <th>Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody id="catTableBody">
+                        <!-- Dynamic items -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal Thêm/Sửa danh mục -->
+    <div class="modal-backdrop" id="catModal" hidden>
+        <div class="modal-card">
+            <h3 class="modal-title" id="catModalTitle">Thêm danh mục sự cố</h3>
+            <form id="catForm">
+                <input type="hidden" id="catIdInput">
+                <div class="form-group" style="margin-top: 14px;">
+                    <label for="inputCatName">Tên danh mục <span class="required">*</span></label>
+                    <input type="text" id="inputCatName" class="form-control" required placeholder="Ví dụ: Sự cố Mạng &amp; WiFi">
+                </div>
+                <div class="form-group" style="margin-top: 14px;">
+                    <label for="inputCatDesc">Mô tả</label>
+                    <textarea id="inputCatDesc" class="form-control" rows="3" placeholder="Mô tả phạm vi sự cố..."></textarea>
+                </div>
+                <div class="form-group" style="margin-top: 14px;">
+                    <label for="inputCatStatus">Trạng thái</label>
+                    <select id="inputCatStatus" class="form-control">
+                        <option value="ACTIVE">Hoạt động (ACTIVE)</option>
+                        <option value="INACTIVE">Tạm ngưng (INACTIVE)</option>
+                    </select>
+                </div>
+                <div class="modal-actions" style="margin-top: 20px;">
+                    <button type="button" class="secondary-button" id="btnCatModalClose">Hủy</button>
+                    <button type="submit" class="primary-button" id="btnCatModalSubmit">Lưu danh mục</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/layout :: footer}"></div>
+    <div th:replace="~{fragments/layout :: toasts}"></div>
+    <div th:replace="~{fragments/layout :: page-scripts}"></div>
+
+    <script th:src="@{/js/main.js}"></script>
+    <script th:src="@{/js/admin-categories.js}"></script>
+</body>
+</html>

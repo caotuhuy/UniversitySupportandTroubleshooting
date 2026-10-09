@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Dashboard tổng quan - EAUT SUPPORT">
+    <title>Dashboard — EAUT SUPPORT</title>
+    <link rel="stylesheet" th:href="@{/css/design-system.css}">
+    <link rel="stylesheet" th:href="@{/css/layout.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body class="app-body">
+<div class="app-body">
+
+    <!-- Sidebar -->
+    <div th:replace="~{fragments/layout :: sidebar}"></div>
+
+    <!-- Main Content Area -->
+    <div class="app-content">
+
+        <!-- Topbar -->
+        <div th:replace="~{fragments/layout :: topbar('Dashboard', true)}"></div>
+
+        <!-- Main -->
+        <main class="app-main">
+
+            <!-- ── Page Header ── -->
+            <div class="page-header">
+                <div class="page-title-group">
+                    <div class="section-eyebrow">Đại học Công nghệ Đông Á</div>
+                    <h1 class="page-title">Dashboard</h1>
+                    <p class="page-subtitle">Tổng quan hệ thống quản lý yêu cầu hỗ trợ và xử lý sự cố kỹ thuật</p>
+                </div>
+                <div class="page-actions">
+                    <!-- Student: Create Request -->
+                    <a class="btn btn-primary" th:href="@{/create-request}"
+                       sec:authorize="hasRole('STUDENT')">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                             viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"/>
+                            <line x1="5" y1="12" x2="19" y2="12"/>
+                        </svg>
+                        Tạo yêu cầu mới
+                    </a>
+                    <!-- Admin: Manage Requests -->
+                    <a class="btn btn-primary" th:href="@{/admin/requests}"
+                       sec:authorize="hasRole('ADMIN')">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                             viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                        </svg>
+                        Điều phối yêu cầu
+                    </a>
+                    <!-- Technician -->
+                    <a class="btn btn-primary" th:href="@{/technician/requests}"
+                       sec:authorize="hasRole('TECHNICIAN') and !hasRole('ADMIN')">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                             viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+                        </svg>
+                        Nhiệm vụ của tôi
+                    </a>
+                </div>
+            </div>
+
+            <!-- ── Error Banner ── -->
+            <div class="alert alert-error" id="dashboardError" hidden role="alert">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="8" x2="12" y2="12"/>
+                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+                <div class="alert-content">
+                    <div class="alert-title">Không thể tải dữ liệu thống kê</div>
+                    <span>Vui lòng kiểm tra kết nối và </span>
+                    <button id="retryDashboard" class="btn btn-sm btn-outline-primary" type="button">Thử lại</button>
+                </div>
+            </div>
+
+            <!-- ── KPI Cards ── -->
+            <section aria-label="Thống kê tổng quan" id="kpiSection">
+                <!-- Skeleton Loading -->
+                <div class="kpi-grid" id="kpiSkeleton">
+                    <div class="skeleton-card" style="min-height:120px">
+                        <div class="skeleton skeleton-title" style="width:40%;margin-bottom:12px"></div>
+                        <div class="skeleton" style="width:60px;height:40px;margin-bottom:8px"></div>
+                        <div class="skeleton skeleton-text" style="width:55%"></div>
+                    </div>
+                    <div class="skeleton-card" style="min-height:120px">
+                        <div class="skeleton skeleton-title" style="width:40%;margin-bottom:12px"></div>
+                        <div class="skeleton" style="width:60px;height:40px;margin-bottom:8px"></div>
+                        <div class="skeleton skeleton-text" style="width:55%"></div>
+                    </div>
+                    <div class="skeleton-card" style="min-height:120px">
+                        <div class="skeleton skeleton-title" style="width:40%;margin-bottom:12px"></div>
+                        <div class="skeleton" style="width:60px;height:40px;margin-bottom:8px"></div>
+                        <div class="skeleton skeleton-text" style="width:55%"></div>
+                    </div>
+                    <div class="skeleton-card" style="min-height:120px">
+                        <div class="skeleton skeleton-title" style="width:40%;margin-bottom:12px"></div>
+                        <div class="skeleton" style="width:60px;height:40px;margin-bottom:8px"></div>
+                        <div class="skeleton skeleton-text" style="width:55%"></div>
+                    </div>
+                    <div class="skeleton-card" style="min-height:120px">
+                        <div class="skeleton skeleton-title" style="width:40%;margin-bottom:12px"></div>
+                        <div class="skeleton" style="width:60px;height:40px;margin-bottom:8px"></div>
+                        <div class="skeleton skeleton-text" style="width:55%"></div>
+                    </div>
+                </div>
+
+                <!-- Actual KPI Grid -->
+                <div class="kpi-grid" id="kpiGrid" hidden>
+                    <!-- Total -->
+                    <div class="kpi-card kpi-blue">
+                        <div class="kpi-card-top">
+                            <div class="kpi-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                     fill="none" stroke="currentColor" stroke-width="2"
+                                     stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/>
+                                    <line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/>
+                                    <line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
+                                </svg>
+                            </div>
+                            <span class="kpi-trend">TỔNG</span>
+                        </div>
+                        <div class="kpi-value" id="kpi-total">—</div>
+                        <div class="kpi-label">Tổng yêu cầu</div>
+                    </div>
+                    <!-- Pending -->
+                    <div class="kpi-card kpi-amber">
+                        <div class="kpi-card-top">
+                            <div class="kpi-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                     fill="none" stroke="currentColor" stroke-width="2"
+                                     stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                                </svg>
+                            </div>
+                            <span class="kpi-trend">CHỜ</span>
+                        </div>
+                        <div class="kpi-value" id="kpi-pending">—</div>
+                        <div class="kpi-label">Chờ tiếp nhận</div>
+                    </div>
+                    <!-- In Progress -->
+                    <div class="kpi-card kpi-teal">
+                        <div class="kpi-card-top">
+                            <div class="kpi-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                     fill="none" stroke="currentColor" stroke-width="2"
+                                     stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                                </svg>
+                            </div>
+                            <span class="kpi-trend">ACTIVE</span>
+                        </div>
+                        <div class="kpi-value" id="kpi-inprogress">—</div>
+                        <div class="kpi-label">Đang xử lý</div>
+                    </div>
+                    <!-- Completed -->
+                    <div class="kpi-card kpi-green">
+                        <div class="kpi-card-top">
+                            <div class="kpi-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                     fill="none" stroke="currentColor" stroke-width="2"
+                                     stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                            </div>
+                            <span class="kpi-trend">DONE</span>
+                        </div>
+                        <div class="kpi-value" id="kpi-completed">—</div>
+                        <div class="kpi-label">Đã hoàn thành</div>
+                    </div>
+                    <!-- Overdue / SLA -->
+                    <div class="kpi-card kpi-red">
+                        <div class="kpi-card-top">
+                            <div class="kpi-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                     fill="none" stroke="currentColor" stroke-width="2"
+                                     stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                                    <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+                                </svg>
+                            </div>
+                            <span class="kpi-trend">SLA</span>
+                        </div>
+                        <div class="kpi-value" id="kpi-overdue">—</div>
+                        <div class="kpi-label">Quá hạn SLA</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ── Main Content Grid ── -->
+            <div class="content-grid-main" style="margin-top:0">
+
+                <!-- Recent Requests Panel -->
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <div class="section-eyebrow" style="margin-bottom:4px">CẦN QUAN TÂM</div>
+                            <h2 class="card-title">Yêu cầu gần đây</h2>
+                        </div>
+                        <a class="btn btn-sm btn-ghost" th:href="@{/requests}" style="gap:4px">
+                            Xem tất cả
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+                                 viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                 stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="5" y1="12" x2="19" y2="12"/>
+                                <polyline points="12 5 19 12 12 19"/>
+                            </svg>
+                        </a>
+                    </div>
+
+                    <!-- Loading Skeleton -->
+                    <div id="recentLoading" style="padding:var(--space-6)">
+                        <div style="display:flex;flex-direction:column;gap:16px">
+                            <div style="display:flex;gap:12px;align-items:center">
+                                <div class="skeleton" style="width:64px;height:14px;border-radius:4px"></div>
+                                <div class="skeleton skeleton-text" style="flex:1"></div>
+                                <div class="skeleton" style="width:80px;height:22px;border-radius:99px"></div>
+                            </div>
+                            <div style="display:flex;gap:12px;align-items:center">
+                                <div class="skeleton" style="width:64px;height:14px;border-radius:4px"></div>
+                                <div class="skeleton skeleton-text" style="flex:1"></div>
+                                <div class="skeleton" style="width:80px;height:22px;border-radius:99px"></div>
+                            </div>
+                            <div style="display:flex;gap:12px;align-items:center">
+                                <div class="skeleton" style="width:64px;height:14px;border-radius:4px"></div>
+                                <div class="skeleton skeleton-text" style="flex:1"></div>
+                                <div class="skeleton" style="width:80px;height:22px;border-radius:99px"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div class="empty-state" id="recentEmpty" hidden>
+                        <div class="empty-state-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                 fill="none" stroke="currentColor" stroke-width="1.5"
+                                 stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                <polyline points="14 2 14 8 20 8"/>
+                            </svg>
+                        </div>
+                        <div class="empty-state-title">Chưa có yêu cầu nào</div>
+                        <div class="empty-state-desc">Chưa có yêu cầu hỗ trợ nào trong hệ thống.</div>
+                    </div>
+
+                    <!-- Table -->
+                    <div class="table-wrapper" id="recentTable" hidden style="border:none;border-radius:0">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Mã YC</th>
+                                    <th>Tiêu đề</th>
+                                    <th>Trạng thái</th>
+                                    <th>Ưu tiên</th>
+                                    <th>Thời gian</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recentBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Right Sidebar Panels -->
+                <div style="display:flex;flex-direction:column;gap:var(--space-5)">
+
+                    <!-- SLA Status Panel -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="section-eyebrow" style="margin-bottom:4px">CAM KẾT DỊCH VỤ</div>
+                                <h2 class="card-title">Chỉ số SLA</h2>
+                            </div>
+                            <span class="badge badge-green" id="slaComplianceBadge">—%</span>
+                        </div>
+                        <div class="card-body-sm">
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-3);margin-bottom:var(--space-4)">
+                                <div style="background:var(--status-rejected-bg);border:1px solid var(--status-rejected-border);border-radius:var(--radius-sm);padding:var(--space-3);text-align:center">
+                                    <div style="font-size:var(--text-xs);font-weight:700;color:var(--status-rejected-text);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Quá hạn</div>
+                                    <div id="slaOverdueCount" style="font-size:1.6rem;font-weight:700;color:#dc2626;line-height:1">0</div>
+                                </div>
+                                <div style="background:var(--status-waiting-bg);border:1px solid var(--status-waiting-border);border-radius:var(--radius-sm);padding:var(--space-3);text-align:center">
+                                    <div style="font-size:var(--text-xs);font-weight:700;color:var(--status-waiting-text);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Sắp hết</div>
+                                    <div id="slaWarningCount" style="font-size:1.6rem;font-weight:700;color:#d97706;line-height:1">0</div>
+                                </div>
+                            </div>
+                            <div style="font-size:var(--text-sm);color:var(--text-muted);line-height:1.5">
+                                Tỷ lệ tuân thủ SLA:
+                                <strong id="slaRateText" style="color:#059669">—%</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Activity / Status Stats Panel -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="section-eyebrow" style="margin-bottom:4px">PHÂN TÍCH</div>
+                                <h2 class="card-title">Trạng thái hệ thống</h2>
+                            </div>
+                            <span class="badge badge-green" style="gap:5px">
+                                <span style="width:6px;height:6px;background:#10b981;border-radius:50%;display:inline-block"></span>
+                                LIVE
+                            </span>
+                        </div>
+                        <div id="activityLoading" class="card-body-sm" style="color:var(--text-muted);font-size:var(--text-sm)">
+                            Đang tải...
+                        </div>
+                        <ul id="activityList" class="card-body-sm" style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px" hidden>
+                        </ul>
+                    </div>
+
+                    <!-- Category Stats -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="section-eyebrow" style="margin-bottom:4px">PHÂN LOẠI</div>
+                                <h2 class="card-title">Theo danh mục</h2>
+                            </div>
+                        </div>
+                        <div id="categoryStats" class="card-body-sm">
+                            <p style="color:var(--text-muted);font-size:var(--text-sm)">Đang tải...</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ── Priority & Technician Row (Admin Only) ── -->
+            <div class="content-grid-2" style="margin-top:var(--space-6)" sec:authorize="hasRole('ADMIN')">
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <div class="section-eyebrow" style="margin-bottom:4px">MỨC ĐỘ</div>
+                            <h2 class="card-title">Phân bổ mức độ ưu tiên</h2>
+                        </div>
+                    </div>
+                    <div id="priorityStats" class="card-body-sm">
+                        <p style="color:var(--text-muted);font-size:var(--text-sm)">Đang tải...</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <div class="section-eyebrow" style="margin-bottom:4px">NHÂN SỰ</div>
+                            <h2 class="card-title">Phân công kỹ thuật viên</h2>
+                        </div>
+                    </div>
+                    <div id="technicianStats" class="card-body-sm">
+                        <p style="color:var(--text-muted);font-size:var(--text-sm)">Đang tải...</p>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- Footer -->
+        <div th:replace="~{fragments/layout :: footer}"></div>
+    </div>
+
+</div>
+
+<!-- Sidebar Overlay -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+<!-- Toast Container -->
+<div th:replace="~{fragments/layout :: toasts}"></div>
+
+<script th:src="@{/js/main.js}"></script>
+<!-- Layout Scripts (sidebar toggle, topbar, toasts) -->
+<div th:replace="~{fragments/layout :: page-scripts}"></div>
+
+<script>
+/* Dashboard-specific init */
+document.addEventListener('DOMContentLoaded', function() {
+    loadDashboard();
+    document.getElementById('retryDashboard').addEventListener('click', loadDashboard);
+});
+
+const STATUS_LABELS = {
+    PENDING:      { label:'Chờ tiếp nhận',  cls:'badge-pending'     },
+    RECEIVED:     { label:'Đã tiếp nhận',   cls:'badge-received'    },
+    ASSIGNED:     { label:'Đã phân công',   cls:'badge-assigned'    },
+    IN_PROGRESS:  { label:'Đang xử lý',     cls:'badge-in-progress' },
+    WAITING_INFO: { label:'Chờ thông tin',  cls:'badge-waiting'     },
+    COMPLETED:    { label:'Hoàn thành',     cls:'badge-completed'   },
+    REJECTED:     { label:'Từ chối',        cls:'badge-rejected'    },
+    CANCELLED:    { label:'Đã hủy',         cls:'badge-cancelled'   }
+};
+
+const PRIORITY_LABELS = {
+    LOW:    { label:'Thấp',    cls:'badge-priority-low'    },
+    MEDIUM: { label:'Trung bình', cls:'badge-priority-medium' },
+    HIGH:   { label:'Cao',     cls:'badge-priority-high'   },
+    URGENT: { label:'Khẩn cấp', cls:'badge-priority-urgent' }
+};
+
+const ACTIVITY_COLORS = {
+    PENDING:      '#f59e0b',
+    RECEIVED:     '#3b82f6',
+    ASSIGNED:     '#8b5cf6',
+    IN_PROGRESS:  '#0ea5e9',
+    WAITING_INFO: '#f97316',
+    COMPLETED:    '#10b981',
+    REJECTED:     '#f43f5e',
+    CANCELLED:    '#94a3b8'
+};
+
+function makeBadge(text, cls) {
+    return '<span class="badge ' + cls + '"><span class="badge-dot"></span>' + text + '</span>';
+}
+
+function formatDate(iso) {
+    if (!iso) return '—';
+    try {
+        const d = new Date(iso);
+        return d.toLocaleString('vi-VN', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
+    } catch(e) { return iso; }
+}
+
+async function loadDashboard() {
+    document.getElementById('dashboardError').hidden = true;
+
+    // Load KPI stats
+    try {
+        const r = await fetch('/api/dashboard/statistics');
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        const d = await r.json();
+        const s = d.data;
+
+        document.getElementById('kpiSkeleton').hidden = true;
+        document.getElementById('kpiGrid').hidden = false;
+
+        document.getElementById('kpi-total').textContent     = s.totalRequests     ?? 0;
+        document.getElementById('kpi-pending').textContent   = s.pendingRequests   ?? 0;
+        document.getElementById('kpi-inprogress').textContent= s.inProgressRequests?? 0;
+        document.getElementById('kpi-completed').textContent = s.completedRequests ?? 0;
+        document.getElementById('kpi-overdue').textContent   = s.overdueCount      ?? 0;
+
+        // SLA Panel
+        document.getElementById('slaOverdueCount').textContent = s.overdueCount ?? 0;
+        document.getElementById('slaWarningCount').textContent = s.slaWarningCount ?? 0;
+        const rate = (s.slaComplianceRate ?? 100).toFixed(1);
+        document.getElementById('slaRateText').textContent = rate + '%';
+        document.getElementById('slaRateText').style.color = rate >= 90 ? '#059669' : rate >= 70 ? '#d97706' : '#dc2626';
+        document.getElementById('slaComplianceBadge').textContent = rate + '%';
+        document.getElementById('slaComplianceBadge').className = 'badge ' +
+            (rate >= 90 ? 'badge-green' : rate >= 70 ? 'badge-orange' : 'badge-red');
+
+        // Activity List (status breakdown)
+        const actList  = document.getElementById('activityList');
+        const actLoad  = document.getElementById('activityLoading');
+        const statuses = ['PENDING','RECEIVED','ASSIGNED','IN_PROGRESS','WAITING_INFO','COMPLETED','REJECTED','CANCELLED'];
+        const countKey = { PENDING:'pendingRequests', RECEIVED:'receivedRequests', ASSIGNED:'assignedRequests',
+            IN_PROGRESS:'inProgressRequests', WAITING_INFO:'waitingInfoRequests', COMPLETED:'completedRequests',
+            REJECTED:'rejectedRequests', CANCELLED:'cancelledRequests' };
+        actList.innerHTML = '';
+        statuses.forEach(function(st) {
+            const cnt = s[countKey[st]] ?? 0;
+            const info = STATUS_LABELS[st];
+            const li = document.createElement('li');
+            li.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 0;border-bottom:1px solid var(--border-color)';
+            li.innerHTML =
+                '<span style="display:flex;align-items:center;gap:8px">' +
+                '  <span style="width:8px;height:8px;border-radius:50%;background:' + ACTIVITY_COLORS[st] + ';flex-shrink:0"></span>' +
+                '  <span style="font-size:var(--text-sm);color:var(--text-secondary)">' + info.label + '</span>' +
+                '</span>' +
+                '<strong style="font-size:var(--text-md);font-weight:700;color:var(--text-primary)">' + cnt + '</strong>';
+            actList.appendChild(li);
+        });
+        actLoad.hidden = true;
+        actList.hidden = false;
+
+        // Category Stats
+        renderBarStats('categoryStats', s.requestsByCategory || {}, null, s.totalRequests);
+
+        // Priority Stats (for all)
+        renderBarStats('priorityStats', s.requestsByPriority || {}, {
+            LOW:'#22c55e', MEDIUM:'#3b82f6', HIGH:'#f97316', URGENT:'#f43f5e'
+        }, s.totalRequests);
+
+        // Technician Stats
+        renderBarStats('technicianStats', s.requestsByTechnician || {}, null, s.totalRequests);
+
+    } catch(e) {
+        document.getElementById('kpiSkeleton').hidden = true;
+        document.getElementById('dashboardError').hidden = false;
+        console.error('Dashboard stats error:', e);
+    }
+
+    // Load recent requests
+    try {
+        const r = await fetch('/api/requests');
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        const d = await r.json();
+        const requests = (d.data || []).slice(0, 8);
+
+        document.getElementById('recentLoading').hidden = true;
+
+        if (requests.length === 0) {
+            document.getElementById('recentEmpty').hidden = false;
+        } else {
+            const tbody = document.getElementById('recentBody');
+            tbody.innerHTML = requests.map(function(req) {
+                const st = STATUS_LABELS[req.status] || { label:req.status, cls:'badge-grey' };
+                const pr = PRIORITY_LABELS[req.priority] || { label:req.priority, cls:'badge-gray' };
+                return '<tr onclick="location.href=\'/requests/' + req.id + '\'" style="cursor:pointer">' +
+                    '<td class="col-code">' + (req.requestCode || '—') + '</td>' +
+                    '<td class="col-title"><strong>' + (req.title || '—') + '</strong>' +
+                    (req.requester ? '<span>' + req.requester.fullName + '</span>' : '') + '</td>' +
+                    '<td>' + makeBadge(st.label, st.cls) + '</td>' +
+                    '<td>' + makeBadge(pr.label, pr.cls) + '</td>' +
+                    '<td style="color:var(--text-muted);font-size:var(--text-sm);white-space:nowrap">' + formatDate(req.createdAt) + '</td>' +
+                    '</tr>';
+            }).join('');
+            document.getElementById('recentTable').hidden = false;
+        }
+    } catch(e) {
+        document.getElementById('recentLoading').hidden = true;
+        document.getElementById('recentEmpty').hidden = false;
+        console.error('Recent requests error:', e);
+    }
+}
+
+function renderBarStats(containerId, dataMap, colorMap, total) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    const entries = Object.entries(dataMap || {});
+    if (entries.length === 0) {
+        container.innerHTML = '<p style="color:var(--text-muted);font-size:var(--text-sm);padding:4px 0">Chưa có dữ liệu.</p>';
+        return;
+    }
+    const maxVal = Math.max(...entries.map(function(e) { return e[1]; }), 1);
+    container.innerHTML = entries.map(function(entry, i) {
+        const key = entry[0], val = entry[1];
+        const pct = Math.round((val / maxVal) * 100);
+        const defaultColors = ['#1e5fa8','#0e7490','#7c3aed','#059669','#d97706','#dc2626','#0369a1','#475569'];
+        const color = (colorMap && colorMap[key]) ? colorMap[key] : defaultColors[i % defaultColors.length];
+        return '<div style="margin-bottom:10px">' +
+            '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">' +
+            '  <span style="font-size:var(--text-sm);color:var(--text-secondary);font-weight:500">' + key + '</span>' +
+            '  <strong style="font-size:var(--text-sm);color:var(--text-primary)">' + val + '</strong>' +
+            '</div>' +
+            '<div style="height:6px;background:var(--bg-muted);border-radius:3px;overflow:hidden">' +
+            '  <div style="height:100%;width:' + pct + '%;background:' + color + ';border-radius:3px;transition:width .5s ease"></div>' +
+            '</div></div>';
+    }).join('');
+}
+</script>
+
+</body>
+</html>

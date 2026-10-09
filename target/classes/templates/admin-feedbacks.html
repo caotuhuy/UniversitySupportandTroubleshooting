@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Đánh Giá & Phản Hồi | EAUT SUPPORT</title>
+    <link rel="stylesheet" th:href="@{/css/design-system.css}">
+    <link rel="stylesheet" th:href="@{/css/layout.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/requests.css}">
+    <link rel="stylesheet" th:href="@{/css/technician-requests.css}">
+    <style>
+        .star-rating {
+            color: #f59e0b;
+            font-size: 1.1rem;
+            letter-spacing: 2px;
+        }
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: #fff;
+            border-radius: 8px;
+            padding: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            border-left: 4px solid #1a365d;
+        }
+        .stat-card.amber { border-left-color: #f59e0b; }
+        .stat-card.green { border-left-color: #10b981; }
+        .stat-card.red { border-left-color: #ef4444; }
+        .stat-card h3 {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+        .stat-card .val {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+        .filter-bar {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+    </style>
+</head>
+<body class="app-body">
+    <div th:replace="~{fragments/layout :: topbar('Quản lý đánh giá &amp; Phản hồi', true)}"></div>
+    <div class="sidebar-overlay"></div>
+    <div th:replace="~{fragments/layout :: sidebar}"></div>
+
+    <main class="app-main">
+        <div class="page-heading">
+            <div>
+                <p class="section-kicker">QUẢN TRỊ HỆ THỐNG</p>
+                <h1>Quản Lý Đánh Giá &amp; Phản Hồi</h1>
+                <p class="page-subtitle">Theo dõi mức độ hài lòng của người dùng và các phản ánh chất lượng dịch vụ hỗ trợ</p>
+            </div>
+        </div>
+
+        <div id="fbAlert" class="tech-alert" style="display: none;"></div>
+
+        <!-- Thống kê đánh giá -->
+        <div class="stats-cards">
+            <div class="stat-card amber">
+                <h3>Điểm đánh giá trung bình</h3>
+                <div class="val" id="avgRatingDisplay">0.0 ★</div>
+            </div>
+            <div class="stat-card">
+                <h3>Tổng số lượt đánh giá</h3>
+                <div class="val" id="totalFeedbacksDisplay">0</div>
+            </div>
+            <div class="stat-card green">
+                <h3>Đánh giá hài lòng (4-5★)</h3>
+                <div class="val" id="positiveFeedbacksDisplay">0</div>
+            </div>
+            <div class="stat-card red">
+                <h3>Đánh giá cần cải thiện (1-2★)</h3>
+                <div class="val" id="negativeFeedbacksDisplay">0</div>
+            </div>
+        </div>
+
+        <!-- Lọc theo số sao -->
+        <div class="filter-bar">
+            <label for="ratingFilter" style="font-weight: 600; font-size: 0.9rem;">Lọc theo số sao:</label>
+            <select id="ratingFilter" class="form-control" style="width: auto; padding: 6px 12px; border-radius: 6px; border: 1px solid #cbd5e1;">
+                <option value="ALL">Tất cả đánh giá</option>
+                <option value="5">5 Sao (Rất hài lòng)</option>
+                <option value="4">4 Sao (Hài lòng)</option>
+                <option value="3">3 Sao (Bình thường)</option>
+                <option value="2">2 Sao (Chưa hài lòng)</option>
+                <option value="1">1 Sao (Kém)</option>
+            </select>
+        </div>
+
+        <!-- Loading -->
+        <div id="fbLoading" class="panel loading-state">
+            <div class="loading-spinner"></div>
+            <p>Đang tải danh sách đánh giá...</p>
+        </div>
+
+        <!-- Empty -->
+        <div id="fbEmpty" class="panel empty-state" hidden>
+            <p class="empty-icon">★</p>
+            <h3>Chưa có đánh giá nào</h3>
+            <p>Hệ thống hiện tại chưa nhận được phản hồi đánh giá nào từ người dùng.</p>
+        </div>
+
+        <!-- Table -->
+        <div id="fbContent" class="panel table-panel" hidden>
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Mã sự cố</th>
+                            <th>Yêu cầu hỗ trợ</th>
+                            <th>Người đánh giá</th>
+                            <th>Mức độ hài lòng</th>
+                            <th>Nhận xét &amp; Góp ý</th>
+                            <th>Thời gian</th>
+                            <th>Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody id="fbTableBody">
+                        <!-- Dynamic items -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <div th:replace="~{fragments/layout :: footer}"></div>
+    <script th:src="@{/js/admin-feedbacks.js}"></script>
+</body>
+</html>

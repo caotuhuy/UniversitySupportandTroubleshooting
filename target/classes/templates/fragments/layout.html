@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<body>
+
+    <!-- ============================================================
+     FRAGMENT: sidebar
+     Usage: <div th:replace="~{fragments/layout :: sidebar}"></div>
+     ============================================================ -->
+    <aside th:fragment="sidebar" class="app-sidebar" id="appSidebar">
+
+        <!-- Brand -->
+        <a class="sidebar-brand" th:href="@{/dashboard}">
+            <div class="sidebar-brand-logo">ĐA</div>
+            <div class="sidebar-brand-text">
+                <div class="sidebar-brand-name">EAUT SUPPORT</div>
+                <div class="sidebar-brand-subtitle">Hỗ trợ công nghệ số</div>
+            </div>
+            <button class="sidebar-toggle-btn" id="sidebarToggleBtn" type="button" aria-label="Thu gọn menu"
+                onclick="toggleSidebar()">
+                <!-- icon: chevrons-left -->
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="11 17 6 12 11 7" />
+                    <polyline points="18 17 13 12 18 7" />
+                </svg>
+            </button>
+        </a>
+
+        <!-- Nav -->
+        <nav class="sidebar-nav" aria-label="Điều hướng chính">
+
+            <!-- === TỔNG QUAN === -->
+            <div class="nav-section">
+                <div class="nav-section-label">Tổng quan</div>
+                <a class="nav-item" th:href="@{/dashboard}"
+                    th:classappend="${currentUri == '/dashboard' or currentUri == '/'} ? ' active' : ''"
+                    data-tooltip="Dashboard">
+                    <span class="nav-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="7" height="7" />
+                            <rect x="14" y="3" width="7" height="7" />
+                            <rect x="14" y="14" width="7" height="7" />
+                            <rect x="3" y="14" width="7" height="7" />
+                        </svg>
+                    </span>
+                    <span class="nav-label-text">Dashboard</span>
+                </a>
+            </div>
+
+            <!-- === SINH VIÊN / GIẢNG VIÊN === -->
+            <div class="nav-section" sec:authorize="hasRole('STUDENT')">
+                <div class="nav-section-label">Yêu cầu của tôi</div>
+                <a class="nav-item" th:href="@{/requests}"
+                    th:classappend="${currentUri == '/requests'} ? ' active' : ''"
+                    data-tooltip="Yêu cầu đã gửi">
+                    <span class="nav-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                            <polyline points="14 2 14 8 20 8" />
+                            <line x1="16" y1="13" x2="8" y2="13" />
+                            <line x1="16" y1="17" x2="8" y2="17" />
+                            <polyline points="10 9 9 9 8 9" />
+                        </svg>
+                    </span>
+                    <span class="nav-label-text">Yêu cầu đã gửi</span>
+                </a>
+                <a class="nav-item" th:href="@{/create-request}"
+                    th:classappend="${currentUri == '/create-request'} ? ' active' : ''"
+                    data-tooltip="Tạo yêu cầu mới">
+                    <span class="nav-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10" />
+                            <line x1="12" y1="8" x2="12" y2="16" />
+                            <line x1="8" y1="12" x2="16" y2="12" />
+                        </svg>
+                    </span>
+                    <span class="nav-label-text">Tạo yêu cầu mới</span>
+                </a>
+            </div>
+
+            <!-- === KỸ THUẬT VIÊN === -->
+            <div class="nav-section" sec:authorize="hasRole('TECHNICIAN') and !hasRole('ADMIN')">
+                <div class="nav-section-label">Nghiệp vụ kỹ thuật</div>
+                <a class="nav-item" th:href="@{/technician/requests}"
+                    th:classappend="${currentUri != null and currentUri.startsWith('/technician')} ? ' active' : ''"
+                    data-tooltip="Yêu cầu được phân công">
+                    <span class="nav-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path
+                                d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
+                        </svg>
+                    </span>
+                    <span class="nav-label-text">Yêu cầu được phân công</span>
+                    <span class="nav-badge" id="techAssignedBadge" style="display:none">0</span>
+                </a>
+            </div>
+
+            <!-- === ADMIN === -->
+            <div class="nav-section" sec:authorize="hasRole('ADMIN')">
+                <div class="nav-section-label">Điều phối yêu cầu</div>
+                <a class="nav-item" th:href="@{/admin/requests}"
+                    th:classappend="${currentUri == '/admin/requests'} ? ' active' : ''"
+                    data-tooltip="Tiếp nhận &amp; Phân công">
+                    <span class="nav-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+                        </svg>
+                    </span>
+                    <span class="nav-label-text">Tiếp nhận &amp; Phân công</span>
+                    <span class="nav-badge" id="adminPendingBadge" style="display:none">0</span>
+                </a>
+                <a class="nav-item" th:href="@{/requests}"
+                    th:classappend="${currentUri == '/requests'} ? ' active' : ''"
+                    data-tooltip="Tất cả yêu cầu">
+                    <span class="nav-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="8" y1="6" x2="21" y2="6" />
+                            <line x1="8" y1="12" x2="21" y2="12" />
+                            <line x1="8" y1="18" x2="21" y2="18" />
+                            <line x1="3" y1="6" x2="3.01" y2="6" />
+                            <line x1="3" y1="12" x2="3.01" y2="12" />
+                            <line x1="3" y1="18" x2="3.01" y2="18" />
+                        </svg>
+                    </span>
+                    <span class="nav-label-text">Tất cả yêu cầu</span>
+                </a>
+            </div>
+
+            <div class="nav-section" sec:authorize="hasRole('ADMIN')">
+                <div class="nav-section-label">Quản lý hệ thống</div>
+                <a class="nav-item" th:href="@{/admin/users}"
+                    th:classappend="${currentUri == '/admin/users'} ? ' active' : ''"
+                    data-tooltip="Người dùng">
+                    <span class="nav-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                            <circle cx="9" cy="7" r="4" />
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                        </svg>
+                    </span>
+                    <span class="nav-label-text">Người dùng</span>
+                </a>
+                <a class="nav-item" th:href="@{/admin/categories}"
+                    th:classappend="${currentUri == '/admin/categories'} ? ' active' : ''"
+                    data-tooltip="Danh mục sự cố">
+                    <span class="nav-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+                        </svg>
+                    </span>
+                    <span class="nav-label-text">Danh mục sự cố</span>
+                </a>
+                <a class="nav-item" th:href="@{/admin/rooms}"
+                    th:classappend="${currentUri == '/admin/rooms'} ? ' active' : ''"
+                    data-tooltip="Phòng học/Làm việc">
+                    <span class="nav-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                            <polyline points="9 22 9 12 15 12 15 22" />
+                        </svg>
+                    </span>
+                    <span class="nav-label-text">Phòng học/Làm việc</span>
+                </a>
+                <a class="nav-item" th:href="@{/admin/devices}"
+                    th:classappend="${currentUri == '/admin/devices'} ? ' active' : ''"
+                    data-tooltip="Quản lý Thiết bị">
+                    <span class="nav-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+                            <line x1="8" y1="21" x2="16" y2="21" />
+                            <line x1="12" y1="17" x2="12" y2="21" />
+                        </svg>
+                    </span>
+                    <span class="nav-label-text">Thiết bị</span>
+                </a>
+                <a class="nav-item" th:href="@{/admin/sla}"
+                    th:classappend="${currentUri == '/admin/sla'} ? ' active' : ''"
+                    data-tooltip="Cấu hình SLA">
+                    <span class="nav-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10" />
+                            <polyline points="12 6 12 12 16 14" />
+                        </svg>
+                    </span>
+                    <span class="nav-label-text">Cấu hình SLA</span>
+                </a>
+                <a class="nav-item" th:href="@{/admin/feedbacks}"
+                    th:classappend="${currentUri == '/admin/feedbacks'} ? ' active' : ''"
+                    data-tooltip="Đánh giá &amp; Phản hồi">
+                    <span class="nav-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon
+                                points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                        </svg>
+                    </span>
+                    <span class="nav-label-text">Đánh giá &amp; Phản hồi</span>
+                </a>
+            </div>
+
+            <!-- === CÁ NHÂN (ALL ROLES) === -->
+            <div class="nav-section">
+                <div class="nav-section-label">Cá nhân</div>
+                <a class="nav-item" th:href="@{/notifications}"
+                    th:classappend="${currentUri == '/notifications'} ? ' active' : ''"
+                    data-tooltip="Thông báo">
+                    <span class="nav-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                        </svg>
+                    </span>
+                    <span class="nav-label-text">Thông báo</span>
+                    <span class="nav-badge" id="sidebarNotifBadge" style="display:none">0</span>
+                </a>
+                <a class="nav-item" th:href="@{/profile}"
+                    th:classappend="${currentUri == '/profile'} ? ' active' : ''"
+                    data-tooltip="Hồ sơ cá nhân">
+                    <span class="nav-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                            <circle cx="12" cy="7" r="4" />
+                        </svg>
+                    </span>
+                    <span class="nav-label-text">Hồ sơ cá nhân</span>
+                </a>
+            </div>
+
+        </nav>
+
+        <!-- Footer Status -->
+        <div class="sidebar-footer">
+            <div class="sidebar-status">
+                <span class="status-pulse"></span>
+                <span>Hệ thống đang hoạt động</span>
+            </div>
+        </div>
+    </aside>
+
+
+    <!-- ============================================================
+     FRAGMENT: topbar
+     Usage: <div th:replace="~{fragments/layout :: topbar(title='Dashboard',breadcrumb='')}"></div>
+     ============================================================ -->
+    <header th:fragment="topbar(pageTitle, breadcrumbItems)" class="app-topbar" id="appTopbar">
+
+        <div class="topbar-left">
+            <!-- Breadcrumb -->
+            <nav class="breadcrumb" aria-label="Điều hướng phân cấp" th:if="${breadcrumbItems != null}">
+                <a th:href="@{/dashboard}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                        <polyline points="9 22 9 12 15 12 15 22" />
+                    </svg>
+                </a>
+                <span class="breadcrumb-sep">/</span>
+                <span class="breadcrumb-current" th:text="${pageTitle}">Trang</span>
+            </nav>
+            <!-- Page Title -->
+            <h1 class="topbar-page-title" th:text="${pageTitle}">Dashboard</h1>
+        </div>
+
+        <div class="topbar-right">
+
+            <!-- Mobile Sidebar Toggle -->
+            <button class="sidebar-mobile-toggle" onclick="openMobileSidebar()" aria-label="Mở menu">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="3" y1="12" x2="21" y2="12" />
+                    <line x1="3" y1="6" x2="21" y2="6" />
+                    <line x1="3" y1="18" x2="21" y2="18" />
+                </svg>
+            </button>
+
+            <!-- Notification Bell -->
+            <a class="topbar-notif-btn" th:href="@{/notifications}" aria-label="Thông báo" id="topbarNotifBtn"
+                title="Thông báo">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                </svg>
+                <span class="notif-badge" id="topbarNotifBadge" style="display:none">0</span>
+            </a>
+
+            <!-- User Menu -->
+            <div class="topbar-user" id="topbarUserMenu" onclick="toggleUserDropdown()">
+                <div class="user-avatar" id="topbarAvatar">
+                    <span sec:authentication="name"
+                        th:text="${#strings.substring(#authentication.name, 0, 2).toUpperCase()}">AD</span>
+                </div>
+                <div class="user-info">
+                    <span class="user-name" sec:authentication="name">Người dùng</span>
+                    <span class="user-role-label">
+                        <span sec:authorize="hasRole('ADMIN')">Quản trị viên</span>
+                        <span sec:authorize="hasRole('TECHNICIAN') and !hasRole('ADMIN')">Kỹ thuật viên</span>
+                        <span sec:authorize="hasRole('STUDENT')">Sinh viên</span>
+                    </span>
+                </div>
+                <span class="topbar-chevron">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                </span>
+
+                <!-- Dropdown -->
+                <div class="user-dropdown" id="userDropdownMenu">
+                    <div class="dropdown-header">
+                        <div class="dropdown-header-name" sec:authentication="name">Người dùng</div>
+                        <div class="dropdown-header-role">
+                            <span sec:authorize="hasRole('ADMIN')">Quản trị viên hệ thống</span>
+                            <span sec:authorize="hasRole('TECHNICIAN') and !hasRole('ADMIN')">Kỹ thuật viên</span>
+                            <span sec:authorize="hasRole('STUDENT')">Sinh viên / Giảng viên</span>
+                        </div>
+                    </div>
+                    <div class="dropdown-menu-list">
+                        <a class="dropdown-menu-item" th:href="@{/profile}">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                                <circle cx="12" cy="7" r="4" />
+                            </svg>
+                            Hồ sơ cá nhân
+                        </a>
+                        <a class="dropdown-menu-item" th:href="@{/profile#password}">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                            </svg>
+                            Đổi mật khẩu
+                        </a>
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <div class="dropdown-menu-list">
+                        <form th:action="@{/logout}" method="post" class="logout-form">
+                            <button type="submit" class="dropdown-menu-item danger">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                                    <polyline points="16 17 21 12 16 7" />
+                                    <line x1="21" y1="12" x2="9" y2="12" />
+                                </svg>
+                                Đăng xuất
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </header>
+
+
+    <!-- ============================================================
+     FRAGMENT: footer
+     ============================================================ -->
+    <footer th:fragment="footer" class="app-footer" id="appFooter">
+        <span>© 2026 <span class="app-footer-brand">Đại học Công nghệ Đông Á</span>
+            <span class="app-footer-sep">•</span> EAUT SUPPORT
+        </span>
+        <span>v2.0 <span class="app-footer-sep">•</span> Trung tâm CNTT &amp; Dịch vụ Số</span>
+    </footer>
+
+
+
+    <!-- ============================================================
+     FRAGMENT: toast-container
+     Usage: <div th:replace="~{fragments/layout :: toasts}"></div>
+     ============================================================ -->
+    <div th:fragment="toasts" class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+
+    <!-- ============================================================
+     FRAGMENT: page-scripts (JS chung cho mọi trang)
+     ============================================================ -->
+    <div th:fragment="page-scripts">
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+
+            /* ── Sidebar Collapse ── */
+            function toggleSidebar() {
+                const sidebar = document.getElementById('appSidebar');
+                const topbar = document.getElementById('appTopbar');
+                const footer = document.getElementById('appFooter');
+                const content = document.querySelector('.app-content');
+                const isCollapsed = sidebar.classList.toggle('collapsed');
+
+                if (topbar) topbar.classList.toggle('sidebar-collapsed', isCollapsed);
+                if (footer) footer.classList.toggle('sidebar-collapsed', isCollapsed);
+                if (content) content.style.marginLeft = isCollapsed
+                    ? 'var(--sidebar-collapsed)'
+                    : 'var(--sidebar-width)';
+
+                localStorage.setItem('sidebarCollapsed', isCollapsed);
+            }
+
+            /* ── Mobile Sidebar ── */
+            function openMobileSidebar() {
+                const sidebar = document.getElementById('appSidebar');
+                const overlay = document.querySelector('.sidebar-overlay');
+                sidebar.classList.add('mobile-open');
+                if (overlay) overlay.classList.add('show');
+            }
+            function closeMobileSidebar() {
+                const sidebar = document.getElementById('appSidebar');
+                const overlay = document.querySelector('.sidebar-overlay');
+                sidebar.classList.remove('mobile-open');
+                if (overlay) overlay.classList.remove('show');
+            }
+
+            /* ── User Dropdown ── */
+            function toggleUserDropdown() {
+                const menu = document.getElementById('userDropdownMenu');
+                const trigger = document.getElementById('topbarUserMenu');
+                const isOpen = menu.classList.toggle('show');
+                trigger.classList.toggle('open', isOpen);
+            }
+            document.addEventListener('click', function (e) {
+                const menu = document.getElementById('userDropdownMenu');
+                const trigger = document.getElementById('topbarUserMenu');
+                if (menu && trigger && !trigger.contains(e.target)) {
+                    menu.classList.remove('show');
+                    trigger.classList.remove('open');
+                }
+            });
+
+            /* ── Toast System ── */
+            window.showToast = function (type, title, message, duration) {
+                duration = duration || 4000;
+                const container = document.getElementById('toastContainer');
+                if (!container) return;
+
+                const icons = {
+                    success: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="toast-icon"><polyline points="20 6 9 17 4 12"/></svg>',
+                    error: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="toast-icon"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>',
+                    warning: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="toast-icon"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+                    info: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="toast-icon"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'
+                };
+
+                const toast = document.createElement('div');
+                toast.className = 'toast toast-' + type;
+                toast.innerHTML = (icons[type] || icons.info) +
+                    '<div class="toast-content">' +
+                    (title ? '<div class="toast-title">' + title + '</div>' : '') +
+                    (message ? '<div class="toast-message">' + message + '</div>' : '') +
+                    '</div>' +
+                    '<button class="toast-close" onclick="this.closest(\'.toast\').remove()">×</button>';
+                container.appendChild(toast);
+
+                setTimeout(function () {
+                    toast.classList.add('toast-hiding');
+                    setTimeout(function () { toast.remove(); }, 300);
+                }, duration);
+            };
+
+            /* ── Notification Badge ── */
+            async function loadNotificationBadge() {
+                try {
+                    const resp = await fetch('/api/auth/me');
+                    if (!resp.ok) return;
+                    const me = await resp.json();
+                    if (!me.data || !me.data.id) return;
+
+                    const nr = await fetch('/api/notifications/user/' + me.data.id);
+                    if (!nr.ok) return;
+                    const nd = await nr.json();
+                    if (!nd.data) return;
+
+                    const unread = nd.data.filter(function (n) { return !n.isRead; }).length;
+                    ['topbarNotifBadge', 'sidebarNotifBadge'].forEach(function (id) {
+                        const el = document.getElementById(id);
+                        if (!el) return;
+                        if (unread > 0) {
+                            el.textContent = unread > 99 ? '99+' : unread;
+                            el.style.display = '';
+                        } else {
+                            el.style.display = 'none';
+                        }
+                    });
+                } catch (e) { }
+            }
+
+            /* ── Init ── */
+            document.addEventListener('DOMContentLoaded', function () {
+                // Restore sidebar state
+                const wasCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+                if (wasCollapsed && window.innerWidth > 1024) {
+                    const sidebar = document.getElementById('appSidebar');
+                    const topbar = document.getElementById('appTopbar');
+                    const footer = document.getElementById('appFooter');
+                    const content = document.querySelector('.app-content');
+                    if (sidebar) sidebar.classList.add('collapsed');
+                    if (topbar) topbar.classList.add('sidebar-collapsed');
+                    if (footer) footer.classList.add('sidebar-collapsed');
+                    if (content) content.style.marginLeft = 'var(--sidebar-collapsed)';
+                }
+
+                // Sidebar overlay click to close
+                const overlay = document.querySelector('.sidebar-overlay');
+                if (overlay) overlay.addEventListener('click', closeMobileSidebar);
+
+                // Load notification badge
+                loadNotificationBadge();
+            });
+
+            /*]]>*/
+        </script>
+    </div>
+
+</body>
+
+</html>

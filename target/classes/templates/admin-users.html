@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý người dùng | EAUT SUPPORT</title>
+    <link rel="stylesheet" th:href="@{/css/design-system.css}">
+    <link rel="stylesheet" th:href="@{/css/layout.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/requests.css}">
+    <link rel="stylesheet" th:href="@{/css/technician-requests.css}">
+</head>
+<body class="app-body">
+    <div th:replace="~{fragments/layout :: topbar('Quản lý người dùng', true)}"></div>
+    <div class="sidebar-overlay"></div>
+    <div th:replace="~{fragments/layout :: sidebar}"></div>
+
+    <main class="app-main">
+        <div class="page-heading">
+            <div>
+                <p class="section-kicker">QUẢN TRỊ HỆ THỐNG</p>
+                <h1>Quản Lý Người Dùng</h1>
+                <p class="page-subtitle">Danh sách tài khoản sinh viên, kỹ thuật viên và quản trị viên trong hệ thống</p>
+            </div>
+            <div class="header-tools">
+                <button type="button" class="primary-button" id="btnOpenCreateUserModal">＋ Thêm người dùng</button>
+            </div>
+        </div>
+
+        <div class="filter-search-wrapper" style="margin-bottom: 20px; display: flex; gap: 12px; flex-wrap: wrap;">
+            <input type="text" id="userSearchInput" class="form-control" placeholder="Tìm theo tên đăng nhập, họ tên, email..." style="max-width: 320px;">
+            <select id="userRoleFilter" class="form-control" style="max-width: 200px;">
+                <option value="ALL">Tất cả vai trò</option>
+                <option value="ROLE_STUDENT">Sinh viên</option>
+                <option value="ROLE_TECHNICIAN">Kỹ thuật viên</option>
+                <option value="ROLE_ADMIN">Quản trị viên</option>
+            </select>
+            <select id="userStatusFilter" class="form-control" style="max-width: 180px;">
+                <option value="ALL">Tất cả trạng thái</option>
+                <option value="ACTIVE">Đang hoạt động</option>
+                <option value="LOCKED">Đã khóa</option>
+            </select>
+        </div>
+
+        <div id="userAlert" class="tech-alert" style="display: none;"></div>
+
+        <!-- Loading -->
+        <div id="userLoading" class="panel loading-state">
+            <div class="loading-spinner"></div>
+            <p>Đang tải danh sách người dùng...</p>
+        </div>
+
+        <!-- Empty -->
+        <div id="userEmpty" class="panel empty-state" hidden>
+            <p class="empty-icon">👤</p>
+            <h3>Không tìm thấy người dùng</h3>
+            <p>Không có tài khoản nào phù hợp với bộ lọc tìm kiếm.</p>
+        </div>
+
+        <!-- Users Table -->
+        <div id="userContent" class="panel table-panel" hidden>
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Tên đăng nhập</th>
+                            <th>Họ và tên</th>
+                            <th>Email</th>
+                            <th>Số điện thoại</th>
+                            <th>Mã SV / CB</th>
+                            <th>Vai trò</th>
+                            <th>Trạng thái</th>
+                            <th>Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userTableBody">
+                        <!-- Dynamic items -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal Thêm / Sửa người dùng -->
+    <div class="modal-backdrop" id="userModal" hidden>
+        <div class="modal-card" style="max-width: 550px;">
+            <h3 class="modal-title" id="userModalTitle">Thêm người dùng mới</h3>
+            <form id="userForm">
+                <input type="hidden" id="userIdInput">
+                <div class="form-group" style="margin-top: 12px;">
+                    <label for="inputUsername">Tên đăng nhập <span class="required">*</span></label>
+                    <input type="text" id="inputUsername" class="form-control" required>
+                </div>
+                <div class="form-group" id="passwordGroup" style="margin-top: 12px;">
+                    <label for="inputPassword">Mật khẩu <span id="pwdRequiredSpan" class="required">*</span></label>
+                    <input type="password" id="inputPassword" class="form-control" placeholder="Mặc định: 123456 (để trống nếu không đổi)">
+                </div>
+                <div class="form-group" style="margin-top: 12px;">
+                    <label for="inputFullName">Họ và tên <span class="required">*</span></label>
+                    <input type="text" id="inputFullName" class="form-control" required>
+                </div>
+                <div class="form-group" style="margin-top: 12px;">
+                    <label for="inputEmail">Email <span class="required">*</span></label>
+                    <input type="email" id="inputEmail" class="form-control" required>
+                </div>
+                <div class="form-group" style="margin-top: 12px;">
+                    <label for="inputPhone">Số điện thoại</label>
+                    <input type="text" id="inputPhone" class="form-control" placeholder="09xxxxxxx">
+                </div>
+                <div class="form-group" style="margin-top: 12px;">
+                    <label for="inputStudentCode">Mã sinh viên / Mã nhân viên</label>
+                    <input type="text" id="inputStudentCode" class="form-control" placeholder="SV2024... hoặc CB01...">
+                </div>
+                <div class="form-group" style="margin-top: 12px;">
+                    <label class="form-label">Vai trò (Role) <span class="required">*</span></label>
+                    <div style="display: flex; gap: 14px; margin-top: 6px;">
+                        <label><input type="checkbox" name="roleCheckbox" value="1"> Sinh viên</label>
+                        <label><input type="checkbox" name="roleCheckbox" value="2"> Kỹ thuật viên</label>
+                        <label><input type="checkbox" name="roleCheckbox" value="3"> Quản trị viên</label>
+                    </div>
+                </div>
+                <div class="modal-actions" style="margin-top: 20px;">
+                    <button type="button" class="secondary-button" id="btnUserModalClose">Hủy</button>
+                    <button type="submit" class="primary-button" id="btnUserModalSubmit">Lưu người dùng</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/layout :: footer}"></div>
+    <div th:replace="~{fragments/layout :: toasts}"></div>
+    <div th:replace="~{fragments/layout :: page-scripts}"></div>
+
+    <script th:src="@{/js/main.js}"></script>
+    <script th:src="@{/js/admin-users.js}"></script>
+</body>
+</html>

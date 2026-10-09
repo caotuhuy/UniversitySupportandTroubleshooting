@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Chi tiết yêu cầu hỗ trợ và tiến trình xử lý - EAUT SUPPORT">
+    <title>Chi tiết yêu cầu — EAUT SUPPORT</title>
+    <link rel="stylesheet" th:href="@{/css/design-system.css}">
+    <link rel="stylesheet" th:href="@{/css/layout.css}">
+    <link rel="stylesheet" th:href="@{/css/request-detail.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body class="app-body">
+<div class="app-body">
+    <div th:replace="~{fragments/layout :: sidebar}"></div>
+    <div class="app-content">
+        <div th:replace="~{fragments/layout :: topbar('Chi tiết yêu cầu', true)}"></div>
+        <main class="app-main">
+
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="page-title-group">
+                    <div class="section-eyebrow">CHI TIẾT YÊU CẦU HỖ TRỢ</div>
+                    <h1 class="page-title" id="pageTitleHeading">Chi tiết yêu cầu</h1>
+                    <p class="page-subtitle">
+                        Mã yêu cầu:
+                        <span id="headerRequestCode" class="request-code-badge" style="font-size:var(--text-md)">—</span>
+                    </p>
+                </div>
+                <div class="page-actions">
+                    <a class="btn btn-secondary" th:href="@{/requests}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+                             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+                        </svg>
+                        Danh sách
+                    </a>
+                    <button class="btn btn-primary" id="btnResumeRequest" type="button" hidden>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+                             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="23 4 23 10 17 10"/>
+                            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+                        </svg>
+                        Cung cấp thêm thông tin
+                    </button>
+                    <a class="btn btn-secondary" id="editRequestButton" href="#" hidden>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+                             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                        </svg>
+                        Chỉnh sửa
+                    </a>
+                    <button class="btn btn-danger" id="cancelRequestButton" type="button" hidden>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+                             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+                        </svg>
+                        Hủy yêu cầu
+                    </button>
+                </div>
+            </div>
+
+            <!-- Loading Spinner -->
+            <div id="detailLoading" class="card" style="padding:var(--space-12);text-align:center" role="status">
+                <div class="spinner spinner-lg" style="margin:0 auto var(--space-4)"></div>
+                <p style="color:var(--text-muted);font-size:var(--text-md)">Đang tải thông tin yêu cầu...</p>
+            </div>
+
+            <!-- Error Banner -->
+            <div id="detailError" class="alert alert-error" role="alert" hidden>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/>
+                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+                <div class="alert-content">
+                    <div class="alert-title" id="alertTitle">Không thể tải thông tin yêu cầu</div>
+                    <p id="alertMessage">Vui lòng thử lại sau.</p>
+                    <div style="display:flex;gap:var(--space-3);margin-top:var(--space-3)">
+                        <button class="btn btn-sm btn-secondary" id="retryButton" type="button" hidden>Thử lại</button>
+                        <a class="btn btn-sm btn-primary" id="backToListButton" th:href="@{/requests}">← Về danh sách</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content Grid -->
+            <div id="detailContent" hidden>
+
+                <!-- Workflow Progress Tracker -->
+                <div class="workflow-tracker" id="workflowTracker">
+                    <div class="workflow-step completed" id="stepCreated">
+                        <div class="workflow-step-num">✓</div>
+                        <span>1. Gửi yêu cầu</span>
+                    </div>
+                    <div class="workflow-sep" id="sep1"></div>
+                    <div class="workflow-step" id="stepReceived">
+                        <div class="workflow-step-num">2</div>
+                        <span>2. Tiếp nhận</span>
+                    </div>
+                    <div class="workflow-sep" id="sep2"></div>
+                    <div class="workflow-step" id="stepAssigned">
+                        <div class="workflow-step-num">3</div>
+                        <span>3. Phân công KTV</span>
+                    </div>
+                    <div class="workflow-sep" id="sep3"></div>
+                    <div class="workflow-step" id="stepInProgress">
+                        <div class="workflow-step-num">4</div>
+                        <span>4. Đang xử lý</span>
+                    </div>
+                    <div class="workflow-sep" id="sep4"></div>
+                    <div class="workflow-step" id="stepCompleted">
+                        <div class="workflow-step-num">5</div>
+                        <span>5. Hoàn thành</span>
+                    </div>
+                </div>
+
+                <div class="detail-grid">
+
+                    <!-- LEFT: Main Info -->
+                    <div style="display:flex;flex-direction:column;gap:var(--space-5)">
+
+                        <!-- Request Info Card -->
+                        <div class="card">
+                            <div class="card-header">
+                                <div>
+                                    <div class="section-eyebrow" style="margin-bottom:4px">NỘI DUNG SỰ CỐ</div>
+                                    <h2 class="card-title">Mô tả và phân loại</h2>
+                                </div>
+                                <div style="display:flex;gap:var(--space-2);align-items:center">
+                                    <span id="detailPriorityBadge" class="priority-badge">—</span>
+                                    <span id="detailStatusBadge" class="request-status">—</span>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <div class="form-label" style="font-size:var(--text-xs);color:var(--text-muted);text-transform:uppercase">Tiêu đề yêu cầu</div>
+                                    <div id="detailTitle" style="font-size:var(--text-xl);font-weight:700;color:var(--text-primary);line-height:1.35">—</div>
+                                </div>
+                                <div class="form-group" style="margin-top:var(--space-4)">
+                                    <div class="form-label" style="font-size:var(--text-xs);color:var(--text-muted);text-transform:uppercase">Mô tả chi tiết</div>
+                                    <div id="detailDescription" style="font-size:var(--text-md);color:var(--text-secondary);line-height:1.65;white-space:pre-wrap;background:var(--bg-subtle);padding:var(--space-4);border-radius:var(--radius-sm);border:1px solid var(--border-color)">—</div>
+                                </div>
+                                <div class="divider"></div>
+                                <div class="meta-grid">
+                                    <div class="meta-item"><div class="meta-key">Danh mục sự cố</div><div class="meta-val" id="detailCategory">—</div></div>
+                                    <div class="meta-item"><div class="meta-key">Người gửi yêu cầu</div><div class="meta-val" id="detailRequester">—</div></div>
+                                    <div class="meta-item"><div class="meta-key">Phòng học / Vị trí</div><div class="meta-val" id="detailRoom">—</div></div>
+                                    <div class="meta-item"><div class="meta-key">Thiết bị liên quan</div><div class="meta-val" id="detailDevice">—</div></div>
+                                    <div class="meta-item"><div class="meta-key">Kỹ thuật viên phụ trách</div><div class="meta-val" id="detailTechnician">—</div></div>
+                                    <div class="meta-item"><div class="meta-key">Thời gian tạo</div><div class="meta-val" id="detailCreatedAt">—</div></div>
+                                    <div class="meta-item"><div class="meta-key">Cập nhật lần cuối</div><div class="meta-val" id="detailUpdatedAt">—</div></div>
+                                    <div class="meta-item"><div class="meta-key">Thời điểm hoàn thành</div><div class="meta-val" id="detailCompletedAt">Chưa hoàn thành</div></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Attachments Card -->
+                        <div class="card" id="attachmentsSection">
+                            <div class="card-header">
+                                <div>
+                                    <div class="section-eyebrow" style="margin-bottom:4px">TÀI LIỆU MINH HỌA</div>
+                                    <h2 class="card-title">Tệp đính kèm</h2>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div id="attachmentsLoading" style="color:var(--text-muted);font-size:var(--text-sm)">Đang tải danh sách tệp đính kèm...</div>
+                                <div id="attachmentsEmpty" style="color:var(--text-muted);font-size:var(--text-sm)" hidden>Chưa có tệp đính kèm nào.</div>
+                                <ul class="attachment-list" id="attachmentsList" hidden></ul>
+
+                                <!-- Upload Form -->
+                                <form id="attachmentUploadForm" style="display:flex;gap:10px;align-items:center;padding-top:var(--space-4);border-top:1px solid var(--border-color);margin-top:var(--space-4);flex-wrap:wrap">
+                                    <input type="file" id="attachmentFileInput" class="form-control" style="max-width:300px;height:auto;padding:6px 10px" required>
+                                    <button type="submit" class="btn btn-sm btn-secondary" id="btnUploadAttachment">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                                             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
+                                        </svg>
+                                        Tải lên tệp
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- History Timeline Card -->
+                        <div class="card">
+                            <div class="card-header">
+                                <div>
+                                    <div class="section-eyebrow" style="margin-bottom:4px">TIẾN TRÌNH XỬ LÝ</div>
+                                    <h2 class="card-title">Nhật ký hoạt động &amp; ghi chú</h2>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div id="historyLoading" style="color:var(--text-muted);font-size:var(--text-sm)">Đang tải lịch sử xử lý...</div>
+                                <div id="historyEmpty" style="color:var(--text-muted);font-size:var(--text-sm)" hidden>Chưa có lịch sử xử lý nào.</div>
+                                <div id="historyError" style="color:#ef4444;font-size:var(--text-sm)" hidden>Không thể tải nhật ký hoạt động.</div>
+                                <div class="timeline" id="historyTimeline" hidden></div>
+                            </div>
+                        </div>
+
+                        <!-- Feedback Card (when COMPLETED) -->
+                        <div class="card" id="feedbackSection" hidden>
+                            <div class="card-header">
+                                <div>
+                                    <div class="section-eyebrow" style="margin-bottom:4px">ĐÁNH GIÁ CHẤT LƯỢNG</div>
+                                    <h2 class="card-title">Phản hồi dịch vụ hỗ trợ</h2>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <!-- Form submit rating -->
+                                <form id="feedbackForm" hidden>
+                                    <p style="font-size:var(--text-sm);color:var(--text-secondary);margin-bottom:var(--space-4)">
+                                        Yêu cầu này đã hoàn thành. Hãy cho chúng tôi biết mức độ hài lòng của bạn đối với dịch vụ hỗ trợ kỹ thuật:
+                                    </p>
+                                    <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-4);flex-wrap:wrap">
+                                        <span style="font-size:var(--text-sm);font-weight:600;color:var(--text-secondary)">Mức độ hài lòng:</span>
+                                        <div class="star-rating" id="starRating">
+                                            <button type="button" class="star-btn active" data-value="1">★</button>
+                                            <button type="button" class="star-btn active" data-value="2">★</button>
+                                            <button type="button" class="star-btn active" data-value="3">★</button>
+                                            <button type="button" class="star-btn active" data-value="4">★</button>
+                                            <button type="button" class="star-btn active" data-value="5">★</button>
+                                        </div>
+                                        <span id="starRatingText" style="font-size:var(--text-sm);color:var(--text-muted);font-weight:600">5 sao - Rất hài lòng</span>
+                                        <input type="hidden" id="selectedRating" value="5">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="feedbackComment">Ý kiến đóng góp / Góp ý</label>
+                                        <textarea id="feedbackComment" class="form-control" rows="3" placeholder="Chia sẻ thêm cảm nhận của bạn về thái độ phục vụ, tốc độ giải quyết..."></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary" id="btnSubmitFeedback">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+                                             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <polyline points="20 6 9 17 4 12"/>
+                                        </svg>
+                                        Gửi đánh giá
+                                    </button>
+                                </form>
+
+                                <!-- View submitted rating -->
+                                <div id="feedbackView" hidden>
+                                    <div id="feedbackDisplayStars" style="font-size:1.6rem;color:#f59e0b;margin-bottom:var(--space-2)">★★★★★</div>
+                                    <p id="feedbackDisplayComment" style="font-size:var(--text-md);color:var(--text-secondary);line-height:1.6;font-style:italic">—</p>
+                                    <small id="feedbackDisplayDate" style="color:var(--text-muted);font-size:var(--text-xs);display:block;margin-top:var(--space-2)"></small>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- RIGHT: Sidebar Info & SLA -->
+                    <div>
+                        <div class="card detail-sticky">
+                            <div class="card-header">
+                                <h3 class="card-title">Cam kết dịch vụ (SLA)</h3>
+                            </div>
+                            <div class="card-body" style="display:flex;flex-direction:column;gap:var(--space-4)">
+                                <div class="meta-item">
+                                    <div class="meta-key">Thời hạn giải quyết SLA</div>
+                                    <div class="meta-val" id="detailSlaDeadline">—</div>
+                                </div>
+                                <div class="meta-item">
+                                    <div class="meta-key">Tiến độ SLA</div>
+                                    <div id="detailSlaStatusBadge">—</div>
+                                </div>
+                                <div class="divider"></div>
+                                <div class="meta-item">
+                                    <div class="meta-key">Trạng thái hiện tại</div>
+                                    <div id="detailStatusText" style="font-weight:700;color:var(--text-primary)">—</div>
+                                </div>
+                                <div class="meta-item">
+                                    <div class="meta-key">Mức độ ưu tiên</div>
+                                    <div id="detailPriorityText" style="font-weight:700;color:var(--text-primary)">—</div>
+                                </div>
+                                <div class="meta-item" id="cancelledAtRow" hidden>
+                                    <div class="meta-key">Thời điểm hủy</div>
+                                    <div class="meta-val" id="detailCancelledAt" style="color:#ef4444">—</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </main>
+        <div th:replace="~{fragments/layout :: footer}"></div>
+    </div>
+</div>
+
+<!-- Modal: Hủy yêu cầu -->
+<div class="modal-backdrop" id="cancelModalBackdrop" hidden>
+    <div class="modal-card">
+        <div class="modal-header">
+            <h3 class="modal-title">Xác nhận hủy yêu cầu hỗ trợ</h3>
+            <button class="modal-close" id="btnCancelModalClose">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="alert alert-warning" style="margin-bottom:var(--space-4)">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                    <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+                </svg>
+                <span>Hành động hủy không thể khôi phục lại trạng thái trước. Vui lòng cho biết lý do hủy:</span>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="cancelReasonInput">Lý do hủy yêu cầu <span class="required">*</span></label>
+                <textarea id="cancelReasonInput" class="form-control" rows="3" placeholder="Nhập lý do cụ thể..."></textarea>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" id="btnCancelModalCloseFooter">Đóng</button>
+            <button type="button" class="btn btn-danger" id="btnConfirmCancel">Xác nhận hủy</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Bổ sung thông tin (Resume) -->
+<div class="modal-backdrop" id="resumeModalBackdrop" hidden>
+    <div class="modal-card">
+        <div class="modal-header">
+            <h3 class="modal-title">Bổ sung thông tin cho kỹ thuật viên</h3>
+            <button class="modal-close" id="btnResumeModalClose">×</button>
+        </div>
+        <div class="modal-body">
+            <p style="font-size:var(--text-sm);color:var(--text-muted);margin-bottom:var(--space-4)">
+                Kỹ thuật viên đang chờ thêm thông tin từ bạn để tiếp tục xử lý. Nhập nội dung bổ sung:
+            </p>
+            <div class="form-group">
+                <label class="form-label" for="resumeNoteInput">Nội dung phản hồi / thông tin bổ sung <span class="required">*</span></label>
+                <textarea id="resumeNoteInput" class="form-control" rows="4" placeholder="Nhập thông tin chi tiết bạn muốn cung cấp thêm..."></textarea>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" id="btnResumeModalCloseFooter">Hủy</button>
+            <button type="button" class="btn btn-primary" id="btnConfirmResume">Gửi &amp; Tiếp tục xử lý</button>
+        </div>
+    </div>
+</div>
+
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+<div th:replace="~{fragments/layout :: toasts}"></div>
+<script th:src="@{/js/main.js}"></script>
+<script th:src="@{/js/request-detail.js}"></script>
+<div th:replace="~{fragments/layout :: page-scripts}"></div>
+<script>
+// Auto close modals
+['cancelModalBackdrop', 'resumeModalBackdrop'].forEach(function(id) {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('click', function(e) { if (e.target === this) this.hidden = true; });
+});
+['btnCancelModalClose', 'btnCancelModalCloseFooter'].forEach(function(id) {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('click', function() { document.getElementById('cancelModalBackdrop').hidden = true; });
+});
+['btnResumeModalClose', 'btnResumeModalCloseFooter'].forEach(function(id) {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('click', function() { document.getElementById('resumeModalBackdrop').hidden = true; });
+});
+</script>
+</body>
+</html>
